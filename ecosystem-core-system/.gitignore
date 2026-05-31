@@ -1,0 +1,29 @@
+# Arquivos compilados do Java (não envie o que o computador gera)
+*.class
+*.jar
+*.war
+*.ear
+bin/
+
+# Pastas específicas do Eclipse (configurações locais do seu PC)
+.metadata/
+.settings/
+.project
+.classpath
+.factorypath
+
+# Logs e arquivos temporários
+*.log
+tmp/
+
+# Pastas de build de ferramentas comuns (caso use Maven ou Gradle)
+target/
+build/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Pasta de arquivos que são geradas pela aplicação
+config/
+logs/
