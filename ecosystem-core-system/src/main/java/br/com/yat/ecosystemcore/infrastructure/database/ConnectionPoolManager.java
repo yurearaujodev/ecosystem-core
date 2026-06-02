@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
@@ -12,7 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import br.com.yat.ecosystemcore.config.DatabaseConfigLoader;
+import br.com.yat.ecosystemcore.configuration.DatabaseConfigLoader;
+import br.com.yat.ecosystemcore.domain.entity.DatabaseConfig;
+import br.com.yat.ecosystemcore.domain.entity.DatabaseCredentials;
 
 /**
  * Classe utilitária responsável por gerenciar o pool de conexões do banco de
@@ -140,6 +143,61 @@ final class ConnectionPoolManager {
 			}
 		}
 		logger.info("Teste de pool finalizado: {}/{} conexões válidas.", success, total);
+	}
+	
+	static DatabaseStatus testTemporaryConnection(DatabaseConfig config, DatabaseCredentials credentials) {
+		Objects.requireNonNull(config, "Configuração do banco não pode ser nula");
+		Objects.requireNonNull(credentials, "Credenciais do banco não podem ser nulas");
+		
+		// Criamos um array de um elemento para conseguir extrair o resultado de dentro do escopo lambda
+		final DatabaseStatus[] resultado = new DatabaseStatus[1];
+		
+		try {
+			// A mágica da segurança acontece aqui:
+			credentials.executarComSenha(senhaAtiva -> {
+				
+				// 1. Cria propriedades em memória simulando o arquivo db.properties
+				Properties tempProps = new Properties();
+				tempProps.setProperty("db.url", config.gerarJdbcUrl());
+				tempProps.setProperty("db.user", config.usuario());
+				tempProps.setProperty("db.driver", "com.mysql.cj.jdbc.Driver");
+				
+				// A String da senha é materializada no último milissegundo possível e fica restrita a este bloco
+				if (senhaAtiva != null && senhaAtiva.length > 0) {
+					tempProps.setProperty("db.password", new String(senhaAtiva));
+				}
+
+				// Propriedades de timeout para o teste falhar rápido
+				tempProps.setProperty("db.connectionTimeout", "4000");
+				tempProps.setProperty("db.validationTimeout", "2000");
+				tempProps.setProperty("db.poolSize", "1"); 
+
+				// 2. Instancia o DataSource temporário e valida a conexão
+				try (HikariDataSource tempDs = new HikariDataSource(HikariConfigBuilder.buildConfig(tempProps))) {
+					try (Connection conn = tempDs.getConnection()) {
+						if (conn.isValid(2)) {
+							resultado[0] = DatabaseStatus.ok(); // Sucesso
+						} else {
+							resultado[0] = DatabaseStatus.error("Conexão inválida no teste.");
+						}
+					}
+				} catch (Exception e) {
+					String msg = e.getMessage().toLowerCase();
+					for (var entry : ERRO_MESSAGES.entrySet()) {
+						if (entry.getKey().test(msg)) {
+							resultado[0] = DatabaseStatus.error(entry.getValue());
+							return;
+						}
+					}
+					resultado[0] = DatabaseStatus.error("Falha na conexão de teste: " + e.getMessage());
+				}
+			});
+			
+			return resultado[0] != null ? resultado[0] : DatabaseStatus.error("Teste não foi executado corretamente.");
+			
+		} catch (Exception e) {
+			return DatabaseStatus.error("Erro crítico ao processar credenciais: " + e.getMessage());
+		}
 	}
 
 	/**

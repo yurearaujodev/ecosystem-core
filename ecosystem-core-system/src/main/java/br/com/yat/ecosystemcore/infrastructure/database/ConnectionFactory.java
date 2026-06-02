@@ -6,6 +6,9 @@ import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import br.com.yat.ecosystemcore.domain.entity.DatabaseConfig;
+import br.com.yat.ecosystemcore.domain.entity.DatabaseCredentials;
 /**
  * Classe utilitária responsável por fornecer conexões ao banco de dados
  * e delegar operações de trannsação ao {@link ConnectionPoolManager}.
@@ -96,8 +99,125 @@ public final class ConnectionFactory {
 	 */
 	public static void shutdown() {
 		ConnectionPoolManager.shutdown();
-	}
+	}	
+	
+	/**
+	 * Realiza um teste de conexão isolado em memória utilizando os dados informados,
+	 * sem alterar o DataSource principal da aplicação ou persistir configurações.
+	 * * @param dto Dados de configuração temporários para teste
+	 * @return instância de {@link DatabaseStatus} indicando o resultado do teste
+	 */
+//	public static DatabaseStatus testRawConnection(DatabaseConfig config, DatabaseCredentials credentials) {
+//		return ConnectionPoolManager.testTemporaryConnection(config, credentials);
+//	}
+//	
+//	public static DatabaseStatus testRawConnection(DatabaseConfig config, DatabaseCredentials credentials) {
+//	    Objects.requireNonNull(config, "Configuração do banco não pode ser nula");
+//	    Objects.requireNonNull(credentials, "Credenciais do banco não podem ser nulas");
+//	    
+//	    final DatabaseStatus[] resultado = new DatabaseStatus[1];
+//	    
+//	    try {
+//	        credentials.executarComSenha(senhaAtiva -> {
+//	            java.util.Properties tempProps = new java.util.Properties();
+//	            tempProps.setProperty("db.url", config.gerarJdbcUrl());
+//	            tempProps.setProperty("db.user", config.usuario());
+//	            tempProps.setProperty("db.driver", "com.mysql.cj.jdbc.Driver");
+//	            
+//	            if (senhaAtiva != null && senhaAtiva.length > 0) {
+//	                tempProps.setProperty("db.password", new String(senhaAtiva));
+//	            }
+//
+//	            tempProps.setProperty("db.connectionTimeout", "4000");
+//	            tempProps.setProperty("db.validationTimeout", "2000");
+//	            tempProps.setProperty("db.poolSize", "1"); 
+//
+//	            // Criamos o HikariConfig temporário usando o Builder
+//	            try (com.zaxxer.hikari.HikariDataSource tempDs = new com.zaxxer.hikari.HikariDataSource(HikariConfigBuilder.buildConfig(tempProps))) {
+//	                try (Connection conn = tempDs.getConnection()) {
+//	                    if (conn.isValid(2)) {
+//	                        resultado[0] = DatabaseStatus.ok();
+//	                    } else {
+//	                        resultado[0] = DatabaseStatus.error("Conexão inválida no teste.");
+//	                    }
+//	                }
+//	            } catch (Exception e) {
+//	                String msg = e.getMessage().toLowerCase();
+//	                // Nota: Como ERRO_MESSAGES está encapsulado na outra classe, tratamos o erro diretamente ou simplificamos aqui:
+//	                if (msg.contains("access denied") || msg.contains("autenticação")) {
+//	                    resultado[0] = DatabaseStatus.error("Usuário ou senha incorretos.");
+//	                } else if (msg.contains("connect") || msg.contains("connection refused")) {
+//	                    resultado[0] = DatabaseStatus.error("MySQL não está rodando.");
+//	                } else if (msg.contains("unknown database")) {
+//	                    resultado[0] = DatabaseStatus.error("Banco de dados não encontrado.");
+//	                } else {
+//	                    resultado[0] = DatabaseStatus.error("Falha na conexão de teste: " + e.getMessage());
+//	                }
+//	            }
+//	        });
+//	        
+//	        return resultado[0] != null ? resultado[0] : DatabaseStatus.error("Teste não foi executado corretamente.");
+//	        
+//	    } catch (Exception e) {
+//	        return DatabaseStatus.error("Erro crítico ao processar credenciais: " + e.getMessage());
+//	    }
+//	}
 
+	public static DatabaseStatus testRawConnection(DatabaseConfig config, DatabaseCredentials credentials) {
+	    Objects.requireNonNull(config, "Configuração do banco não pode ser nula");
+	    Objects.requireNonNull(credentials, "Credenciais do banco não podem ser nulas");
+	    
+	    final DatabaseStatus[] resultado = new DatabaseStatus[1];
+	    
+	    try {
+	        credentials.executarComSenha(senhaAtiva -> {
+	            // Instanciamos a configuração nativa do HikariCP sem passar pelo seu Builder customizado
+	            com.zaxxer.hikari.HikariConfig hikariConfig = new com.zaxxer.hikari.HikariConfig();
+	            
+	            // Injetamos as propriedades limpas e descriptografadas que vieram da UI
+	            hikariConfig.setJdbcUrl(config.gerarJdbcUrl());
+	            hikariConfig.setUsername(config.usuario());
+	            hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
+	            
+	            if (senhaAtiva != null && senhaAtiva.length > 0) {
+	                hikariConfig.setPassword(new String(senhaAtiva));
+	            }
+
+	            // Timeouts curtos para que a resposta na UI seja rápida se o banco estiver fora do ar
+	            hikariConfig.setConnectionTimeout(4000);
+	            hikariConfig.setValidationTimeout(2000);
+	            hikariConfig.setMaximumPoolSize(1); 
+
+	            // Criamos o DataSource temporário isolado de toda a infraestrutura
+	            try (com.zaxxer.hikari.HikariDataSource tempDs = new com.zaxxer.hikari.HikariDataSource(hikariConfig)) {
+	                try (Connection conn = tempDs.getConnection()) {
+	                    if (conn.isValid(2)) {
+	                        resultado[0] = DatabaseStatus.ok();
+	                    } else {
+	                        resultado[0] = DatabaseStatus.error("Conexão inválida no teste.");
+	                    }
+	                }
+	            } catch (Exception e) {
+	                String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
+	                if (msg.contains("access denied") || msg.contains("autenticação")) {
+	                    resultado[0] = DatabaseStatus.error("Usuário ou senha incorretos.");
+	                } else if (msg.contains("connect") || msg.contains("connection refused")) {
+	                    resultado[0] = DatabaseStatus.error("MySQL não está rodando.");
+	                } else if (msg.contains("unknown database")) {
+	                    resultado[0] = DatabaseStatus.error("Banco de dados não encontrado.");
+	                } else {
+	                    resultado[0] = DatabaseStatus.error("Falha na conexão de teste: " + e.getMessage());
+	                }
+	            }
+	        });
+	        
+	        return resultado[0] != null ? resultado[0] : DatabaseStatus.error("Teste não foi executado corretamente.");
+	        
+	    } catch (Exception e) {
+	        return DatabaseStatus.error("Erro crítico ao processar credenciais: " + e.getMessage());
+	    }
+	}
+	
 	/**
 	 * Valida se a conexão não é nula.
 	 * 

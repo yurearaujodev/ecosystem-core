@@ -89,11 +89,51 @@ public class MenuController implements Initializable {
         // MÓDULO: ADMINISTRAÇÃO
         lista.add(new MenuDinamicoDTO("ADMINISTRAÇÃO", "Configuração da Conta", "ADMIN_TENANT_CONFIG"));
         lista.add(new MenuDinamicoDTO("ADMINISTRAÇÃO", "Parâmetros Operacionais", "ADMIN_PARAMETROS"));
+        lista.add(new MenuDinamicoDTO("ADMINISTRAÇÃO", "Configuração do Banco", "CONFIGURACAO_BANCO"));
         
         // MÓDULO: AUDITORIA
         lista.add(new MenuDinamicoDTO("AUDITORIA", "Rastreador de Logs", "AUDITORIA_LOGS"));
         lista.add(new MenuDinamicoDTO("AUDITORIA", "Agendador de Tarefas (Jobs)", "AUDITORIA_JOBS"));
         
         return lista;
+    }
+    
+    /**
+     * Atualiza o indicador visual do banco de dados no rodapé do sistema (Thread-Safe).
+     */
+    public void atualizarStatusBanco(boolean online) {
+        Platform.runLater(() -> {
+            if (online) {
+                lblStatusBanco.setText("ONLINE");
+                lblStatusBanco.setStyle("-fx-text-fill: #2B8A3E; -fx-font-weight: bold;"); // Verde corporativo
+                // Se possuir uma fábrica de ícones ou imagens:
+                // imgStatusBanco.setImage(new Image(getClass().getResourceAsStream("/ui/icons/banco-ok.png")));
+            } else {
+                lblStatusBanco.setText("OFFLINE");
+                lblStatusBanco.setStyle("-fx-text-fill: #C92A2A; -fx-font-weight: bold;"); // Vermelho corporativo
+                // imgStatusBanco.setImage(new Image(getClass().getResourceAsStream("/ui/icons/banco-erro.png")));
+            }
+        });
+    }
+
+    /**
+     * Define o texto dinâmico da label de tempo de acesso.
+     */
+    public void setTempoAcesso(String tempo) {
+        Platform.runLater(() -> lblTempoAcesso.setText(tempo));
+    }
+
+    /**
+     * Define o texto dinâmico da label de hora corrente.
+     */
+    public void setHora(String horaTexto) {
+        Platform.runLater(() -> lblHora.setText(horaTexto));
+    }
+
+    /**
+     * Altera o nome do usuário ativo exibido no painel lateral.
+     */
+    public void setNomeUsuario(String nome) {
+        Platform.runLater(() -> lblUsuarioLogado.setText(nome));
     }
 }

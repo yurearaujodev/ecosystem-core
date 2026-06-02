@@ -1,6 +1,7 @@
 package br.com.yat.ecosystemcore.domain.enums;
 
 public enum MenuChave {
+	HOME,
     CADASTROS_EMPRESA,
     CADASTROS_PESSOA,
     CADASTROS_USUARIO,
@@ -9,5 +10,6 @@ public enum MenuChave {
     ADMIN_TENANT_CONFIG,
     ADMIN_PARAMETROS,
     AUDITORIA_LOGS,
-    AUDITORIA_JOBS;
+    AUDITORIA_JOBS,
+    CONFIGURACAO_BANCO;
 }

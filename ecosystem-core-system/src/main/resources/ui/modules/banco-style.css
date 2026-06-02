@@ -1,0 +1,26 @@
+/* Estilo geral dos botões do sistema */
+.button {
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+/* Classes para controlar dinamicamente a label de Status */
+.status-nao-testado {
+    -fx-text-fill: #34495e;
+    -fx-font-weight: normal;
+}
+
+.status-aguardando {
+    -fx-text-fill: #d35400;
+    -fx-font-weight: bold;
+}
+
+.status-sucesso {
+    -fx-text-fill: #27ae60;
+    -fx-font-weight: bold;
+}
+
+.status-erro {
+    -fx-text-fill: #c0392b;
+    -fx-font-weight: bold;
+}

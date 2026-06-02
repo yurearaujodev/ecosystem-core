@@ -5,7 +5,7 @@ import java.util.Properties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.yat.ecosystemcore.config.DatabaseConfigLoader;
+import br.com.yat.ecosystemcore.configuration.DatabaseConfigLoader;
 import br.com.yat.ecosystemcore.infrastructure.security.CryptoException;
 
 @DisplayName("Unidade - DatabaseConfigLoader")

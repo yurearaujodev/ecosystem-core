@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="rootContainer" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+           fx:controller="br.com.yat.ecosystemcore.ui.modules.banco.ConfiguracaoBancoController"
+           stylesheets="@banco-style.css"
+           style="-fx-background-color: #F4F4F4;">
+
+    <VBox alignment="CENTER" spacing="15.0" 
+          prefWidth="450.0" prefHeight="320.0" 
+          maxWidth="450.0" maxHeight="320.0"
+          style="-fx-background-color: #FFFFFF; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+          
+        <children>
+            <GridPane hgap="10.0" vgap="10.0" VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="110.0" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="120.0" />
+                    <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="60.0" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="80.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                </rowConstraints>
+                <children>
+                    <Label text="NOME DO BANCO:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <TextField fx:id="txtNomeBanco" prefHeight="25.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="0" />
+                    
+                    <Label text="ENDEREÇO IP:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtEnderecoIp" prefHeight="25.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    
+                    <Label text="PORTA:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtPorta" prefHeight="25.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                    
+                    <Label text="USUÁRIO:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <TextField fx:id="txtRoot" prefHeight="25.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2" />
+                    
+                    <Label text="SENHA:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <PasswordField fx:id="txtPassword" prefHeight="25.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3" />
+                    
+                    <Label text="STATUS:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                    <Label fx:id="lblStatusConexao" text="NÃO TESTADO" styleClass="status-nao-testado" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4" />
+                </children>
+            </GridPane>
+            <HBox alignment="CENTER" spacing="15.0">
+                <padding>
+                    <Insets bottom="20.0" />
+                </padding>
+                <children>
+                    <Button fx:id="btnTestar" mnemonicParsing="false" onAction="#testar" prefHeight="35.0" prefWidth="195.0" text="TESTAR CONEXÃO" />
+                    <Button fx:id="btnSalvar" disable="true" mnemonicParsing="false" onAction="#salvar" prefHeight="35.0" prefWidth="195.0" text="SALVAR E CONTINUAR" />
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+</StackPane>

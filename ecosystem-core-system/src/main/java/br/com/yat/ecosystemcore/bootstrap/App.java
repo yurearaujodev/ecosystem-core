@@ -16,7 +16,7 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         try {
             // Carrega o FXML da moldura principal localizado na pasta resources
-            Parent root = FXMLLoader.load(getClass().getResource("/ui/menu/MenuView.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/ui/menu/menu-view.fxml"));
             Scene scene = new Scene(root);
             
             primaryStage.setTitle("YAT Ecosystem Core");

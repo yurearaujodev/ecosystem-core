@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariConfig;
 
-import br.com.yat.ecosystemcore.config.DatabaseConfigLoader;
+import br.com.yat.ecosystemcore.configuration.DatabaseConfigLoader;
 import br.com.yat.ecosystemcore.domain.enums.CryptoErrorType;
 import br.com.yat.ecosystemcore.infrastructure.security.CryptoException;
 import br.com.yat.ecosystemcore.infrastructure.security.DatabaseFieldDecryptor;
