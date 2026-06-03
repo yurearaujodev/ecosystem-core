@@ -3,13 +3,15 @@ package br.com.yat.ecosystemcore.infrastructure.concurrent;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class AppExecutors {
     
-    private static final ExecutorService DATABASE_EXECUTOR = Executors.newSingleThreadExecutor(runnable -> {
+    private static final AtomicInteger threadNumber = new AtomicInteger(1);
+    private static final ExecutorService DATABASE_EXECUTOR = Executors.newFixedThreadPool(4, runnable -> {
         Thread thread = new Thread(runnable);
         thread.setDaemon(true);
-        thread.setName("db-pool-thread");
+        thread.setName("db-pool-thread-" + threadNumber.getAndIncrement());
         return thread;
     });
 

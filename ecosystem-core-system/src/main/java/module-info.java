@@ -12,6 +12,7 @@ module br.com.yat.ecosystemcore {
     requires org.apache.logging.log4j;
     requires com.fasterxml.jackson.databind;
     requires googleauth;
+	requires jbcrypt;
 
     // EXPORTS: Garante acesso à classe App que está no bootstrap
     exports br.com.yat.ecosystemcore.bootstrap;
@@ -27,6 +28,9 @@ module br.com.yat.ecosystemcore {
     opens br.com.yat.ecosystemcore.ui.menu to javafx.fxml;
     opens br.com.yat.ecosystemcore.ui.core to javafx.fxml;
     opens br.com.yat.ecosystemcore.ui.modules.empresa to javafx.fxml;
+
+    opens br.com.yat.ecosystemcore.ui.modules.login to javafx.fxml;
+    opens br.com.yat.ecosystemcore.ui.modules.tenant to javafx.fxml;
     
     // 👇 ADICIONE ESTA LINHA AQUI: Liberando a nova tela de banco para o FXMLLoader funcionar
     opens br.com.yat.ecosystemcore.ui.modules.banco to javafx.fxml;

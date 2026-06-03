@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDate;
@@ -63,6 +64,26 @@ public abstract class GenericDao<T, PK> {
         return lista;
     }
 
+    /**
+     * Busca no máximo um registro mapeado pela entidade do DAO ({@link #mapResultSetToEntity}).
+     * Preferir este método em vez de {@link #executeQuerySingle} com lambda que engole SQLException.
+     */
+    protected Optional<T> executeQuerySingleEntity(Connection conn, String sql, Object... params) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            bindParameters(stmt, params);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToEntity(rs));
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Busca genérica com mapper customizado. O mapper deve propagar {@link SQLException};
+     * não retornar {@code null} para mascarar erro de leitura (use {@link #executeQuerySingleEntity} para entidades).
+     */
     protected <R> Optional<R> executeQuerySingle(Connection conn, String sql, Function<ResultSet, R> mapper, Object... params) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             bindParameters(stmt, params);
@@ -75,6 +96,23 @@ public abstract class GenericDao<T, PK> {
         return Optional.empty();
     }
 
+    protected LocalDateTime readLocalDateTime(ResultSet rs, String column) throws SQLException {
+        Timestamp ts = rs.getTimestamp(column);
+        return ts != null ? ts.toLocalDateTime() : null;
+    }
+    
+    protected Long executeInsertReturningId(Connection conn, String sql, Object... params) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            bindParameters(stmt, params);
+            stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) return rs.getLong(1);
+            }
+        }
+        return null;
+    }
+
     // =========================================================================
     // MÉTODOS CORE MULTI-TENANT (Com chaves genéricas e segurança de isolamento)
     // =========================================================================
@@ -84,8 +122,7 @@ public abstract class GenericDao<T, PK> {
      */
     public Optional<T> searchById(Connection conn, PK id, String tenantId) throws SQLException {
         String sql = "SELECT * FROM " + tableName + " WHERE " + pkName + " = ? AND tenant_id = ? AND deleted_at IS NULL";
-        List<T> resultados = executeQuery(conn, sql, id, tenantId);
-        return resultados.isEmpty() ? Optional.empty() : Optional.of(resultados.get(0));
+        return executeQuerySingleEntity(conn, sql, id, tenantId);
     }
 
     /**

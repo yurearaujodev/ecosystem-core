@@ -1,33 +1,33 @@
 package br.com.yat.ecosystemcore.infrastructure.security;
 
-//Mocks temporários para não quebrar a compilação enquanto você cria o seu banco de dados
-class Usuario {}
-class Tenant {}
-class Empresa {}
+import br.com.yat.ecosystemcore.domain.entity.Usuario;
+import br.com.yat.ecosystemcore.domain.entity.Tenant;
+import br.com.yat.ecosystemcore.domain.entity.Empresa;
 
 /**
-* Contexto global thread-safe da sessão do usuário logado.
-*/
+ * Contexto global thread-safe da sessão do usuário logado.
+ * Modificado para usar ThreadLocal, garantindo isolamento total entre Threads.
+ */
 public final class SessionManager {
- private static Usuario usuarioLogado;
- private static Tenant tenantAtual;
- private static Empresa empresaFilial;
+    private static final ThreadLocal<Usuario> usuarioLogado = new ThreadLocal<>();
+    private static final ThreadLocal<Tenant> tenantAtual = new ThreadLocal<>();
+    private static final ThreadLocal<Empresa> empresaFilial = new ThreadLocal<>();
 
- private SessionManager() {} 
+    private SessionManager() {} 
 
- public static synchronized void iniciarSessao(Usuario usuario, Tenant tenant, Empresa empresa) {
-     usuarioLogado = usuario;
-     tenantAtual = tenant;
-     empresaFilial = empresa;
- }
+    public static void iniciarSessao(Usuario usuario, Tenant tenant, Empresa empresa) {
+        usuarioLogado.set(usuario);
+        tenantAtual.set(tenant);
+        empresaFilial.set(empresa);
+    }
 
- public static synchronized void encerrarSessao() {
-     usuarioLogado = null;
-     tenantAtual = null;
-     empresaFilial = null;
- }
+    public static void encerrarSessao() {
+        usuarioLogado.remove();
+        tenantAtual.remove();
+        empresaFilial.remove();
+    }
 
- public static Usuario getUsuarioLogado() { return usuarioLogado; }
- public static Tenant getTenantAtual() { return tenantAtual; }
- public static Empresa getEmpresaFilial() { return empresaFilial; }
+    public static Usuario getUsuarioLogado() { return usuarioLogado.get(); }
+    public static Tenant getTenantAtual() { return tenantAtual.get(); }
+    public static Empresa getEmpresaFilial() { return empresaFilial.get(); }
 }
