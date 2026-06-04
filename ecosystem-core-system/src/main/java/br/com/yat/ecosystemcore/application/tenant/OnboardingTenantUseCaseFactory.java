@@ -7,7 +7,6 @@ import br.com.yat.ecosystemcore.repository.perfil.PerfilRepository;
 import br.com.yat.ecosystemcore.repository.tenant.TenantRepository;
 import br.com.yat.ecosystemcore.repository.usuario.PessoaRepository;
 import br.com.yat.ecosystemcore.repository.usuario.UsuarioRepository;
-import br.com.yat.ecosystemcore.repository.usuario.UsuarioSegurancaConfigRepository;
 
 public final class OnboardingTenantUseCaseFactory {
 
@@ -22,8 +21,7 @@ public final class OnboardingTenantUseCaseFactory {
                 new UsuarioRepository(),
                 new PerfilRepository(),
                 new EmpresaUsuarioRepository(),
-                new UsuarioSegurancaConfigRepository(),
-                new BCryptPasswordEncoder()
+                new BCryptPasswordEncoder() // Mantém a implementação concreta do encoder
         );
     }
 }

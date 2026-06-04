@@ -12,26 +12,34 @@ module br.com.yat.ecosystemcore {
     requires org.apache.logging.log4j;
     requires com.fasterxml.jackson.databind;
     requires googleauth;
-	requires jbcrypt;
+    requires jbcrypt;
 
     // EXPORTS: Garante acesso à classe App que está no bootstrap
     exports br.com.yat.ecosystemcore.bootstrap;
-    // Adicionado para permitir que outros módulos vejam as classes de banco se necessário
     exports br.com.yat.ecosystemcore.ui.modules.banco; 
-    
     exports br.com.yat.ecosystemcore.ui.core;
-    
     exports br.com.yat.ecosystemcore.domain.enums;
     
-    // OPENS: Abre APENAS as pastas que realmente contêm arquivos e controllers
+    // ⬇️ LIBERA O PACOTE SYSTEM PARA COMPILAÇÃO ⬇️
+    exports br.com.yat.ecosystemcore.ui.modules.system;
+    
+    // OPENS: Abre as pastas que contêm arquivos e controllers para o JavaFX
     opens br.com.yat.ecosystemcore.bootstrap to javafx.fxml;
     opens br.com.yat.ecosystemcore.ui.menu to javafx.fxml;
     opens br.com.yat.ecosystemcore.ui.core to javafx.fxml;
     opens br.com.yat.ecosystemcore.ui.modules.empresa to javafx.fxml;
-
     opens br.com.yat.ecosystemcore.ui.modules.login to javafx.fxml;
     opens br.com.yat.ecosystemcore.ui.modules.tenant to javafx.fxml;
-    
-    // 👇 ADICIONE ESTA LINHA AQUI: Liberando a nova tela de banco para o FXMLLoader funcionar
     opens br.com.yat.ecosystemcore.ui.modules.banco to javafx.fxml;
+    
+    // ⬇️ LIBERA O REFLEXÃO DO FXMLLOADER PARA O SEU NOVO CONTROLADOR ⬇️
+    opens br.com.yat.ecosystemcore.ui.modules.system to javafx.fxml;
+    opens br.com.yat.ecosystemcore.ui.modules.home to javafx.fxml;
+    opens br.com.yat.ecosystemcore.ui.modules.pessoa to javafx.fxml;
+    opens br.com.yat.ecosystemcore.ui.modules.usuario to javafx.fxml;
+
+    // =========================================================================
+    // 🔑 CORREÇÃO DO ERRO: ABRE O DOMÍNIO PARA A TABLEVIEW DO JAVAFX RENDEREZAR
+    // =========================================================================
+    opens br.com.yat.ecosystemcore.domain.entity to javafx.base;
 }

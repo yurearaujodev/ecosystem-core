@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToWidth="true" prefHeight="650.0" prefWidth="850.0" style="-fx-background-color: #FFFFFF; -fx-background: #FFFFFF;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.yat.ecosystemcore.ui.modules.tenant.OnboardingTenantController">
+<ScrollPane fitToWidth="true" prefHeight="700.0" prefWidth="950.0" style="-fx-background-color: #FFFFFF; -fx-background: #FFFFFF;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.yat.ecosystemcore.ui.modules.tenant.OnboardingTenantController">
    <content>
       <VBox spacing="25.0">
          <padding>
@@ -24,12 +24,12 @@
             
             <VBox spacing="5.0">
                <children>
-                  <Label text="Onboarding de Novo Tenant" textFill="#1A1B1E">
+                  <Label text="Instalação &amp; Setup do Ecossistema (Onboarding Master)" textFill="#1A1B1E">
                      <font>
                         <Font name="System Bold" size="24.0" />
                      </font>
                   </Label>
-                  <Label text="Configure a infraestrutura inicial para uma nova empresa parceira no ecossistema." textFill="#909296" />
+                  <Label text="Preencha todos os parâmetros estruturais para criar a infraestrutura base e o usuário mestre no banco de dados." textFill="#909296" />
                </children>
             </VBox>
             
@@ -38,96 +38,127 @@
                   
                   <VBox spacing="15.0" HBox.hgrow="ALWAYS" style="-fx-border-color: #E9ECEF; -fx-border-width: 0 1 0 0; -fx-padding: 0 20 0 0;">
                      <children>
-                        <Label text="Dados da Empresa &amp; Assinatura" textFill="#228BE6">
+                        <Label text="Infraestrutura do Tenant &amp; Parâmetros" textFill="#228BE6">
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>
                         </Label>
                         
-                        <GridPane hgap="10.0" vgap="12.0">
+                        <GridPane hgap="10.0" vgap="10.0">
                            <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" maxWidth="110.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="10.0" prefWidth="115.0" />
                               <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                            </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                           </rowConstraints>
                            <children>
                               <Label text="Nome da Conta:" textFill="#495057" GridPane.rowIndex="0" />
-                              <TextField fx:id="txtNomeConta" promptText="Ex: filial_sp" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                              <TextField fx:id="txtNomeConta" promptText="Ex: escopo_global ou filial_master" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                               
-                              <Label text="Plano Base:" textFill="#495057" GridPane.rowIndex="1" />
-                              <ComboBox fx:id="cbPlano" maxWidth="1.7976931348623157E308" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="Plano do Banco:" textFill="#495057" GridPane.rowIndex="1" />
+                              <ComboBox fx:id="cbPlano" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               
-                              <Label text="Razão Social:" textFill="#495057" GridPane.rowIndex="2" />
-                              <TextField fx:id="txtRazaoSocial" promptText="Nome jurídico oficial" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="Fuso Horário (Timezone):" textFill="#495057" GridPane.rowIndex="2" />
+                              <TextField fx:id="txtTimezone" promptText="Ex: America/Sao_Paulo" text="America/Sao_Paulo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               
-                              <Label text="Nome Fantasia:" textFill="#495057" GridPane.rowIndex="3" />
-                              <TextField fx:id="txtNomeFantasia" promptText="Nome comercial" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label text="Limite Usuários:" textFill="#495057" GridPane.rowIndex="3" />
+                              <TextField fx:id="txtLimiteUsuarios" promptText="Ex: 5" text="99" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                               
-                              <Label text="CNPJ:" textFill="#495057" GridPane.rowIndex="4" />
-                              <TextField fx:id="txtCnpj" promptText="Apenas números" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <Label text="Razão Social:" textFill="#495057" GridPane.rowIndex="4" />
+                              <TextField fx:id="txtRazaoSocial" promptText="Razão Social da Empresa" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                               
-                              <Label text="Telefone Corp:" textFill="#495057" GridPane.rowIndex="5" />
-                              <TextField fx:id="txtTelefoneEmpresa" promptText="(00) 0000-0000" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <Label text="Nome Fantasia:" textFill="#495057" GridPane.rowIndex="5" />
+                              <TextField fx:id="txtNomeFantasia" promptText="Nome Comercial" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                               
-                              <Label text="Cidade:" textFill="#495057" GridPane.rowIndex="6" />
-                              <TextField fx:id="txtCidade" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <Label text="CNPJ da Empresa:" textFill="#495057" GridPane.rowIndex="6" />
+                              <TextField fx:id="txtCnpj" promptText="Apenas números" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                               
-                              <Label text="Estado (UF):" textFill="#495057" GridPane.rowIndex="7" />
-                              <TextField fx:id="txtEstado" promptText="Ex: SP" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                              <Label text="Telefone Corp:" textFill="#495057" GridPane.rowIndex="7" />
+                              <TextField fx:id="txtTelefoneEmpresa" promptText="Telefone fixo/celular" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                              
+                              <Label text="Insc. Estadual:" textFill="#495057" GridPane.rowIndex="8" />
+                              <TextField fx:id="txtInscricaoEstadual" promptText="Isento ou Número" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                              
+                              <Label text="Cidade / Estado:" textFill="#495057" GridPane.rowIndex="9" />
+                              <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                                 <children>
+                                    <TextField fx:id="txtCidade" promptText="Cidade" HBox.hgrow="ALWAYS" />
+                                    <TextField fx:id="txtEstado" maxWidth="60.0" promptText="UF" />
+                                 </children>
+                              </HBox>
+                              
+                              <Label text="Endereço / CEP:" textFill="#495057" GridPane.rowIndex="10" />
+                              <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
+                                 <children>
+                                    <TextField fx:id="txtLogradouro" promptText="Rua, Av..." HBox.hgrow="ALWAYS" />
+                                    <TextField fx:id="txtCep" maxWidth="90.0" promptText="CEP" />
+                                 </children>
+                              </HBox>
                            </children>
+                           <rowConstraints>
+                              <RowConstraints /> <RowConstraints /> <RowConstraints /> <RowConstraints />
+                              <RowConstraints /> <RowConstraints /> <RowConstraints /> <RowConstraints />
+                              <RowConstraints /> <RowConstraints /> <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
+                        
+                        <VBox spacing="8.0" style="-fx-padding: 15 0 0 0;">
+                           <children>
+                              <Label text="Ativação de Módulos no Tenant" textFill="#228BE6">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <ScrollPane fitToWidth="true" prefHeight="150.0" style="-fx-border-color: #CED4DA;">
+                                 <content>
+                                    <VBox fx:id="vboxModulosDisponiveis" padding="10.0" spacing="8.0" style="-fx-background-color: #FAFAFA;" />
+                                 </content>
+                              </ScrollPane>
+                           </children>
+                        </VBox>
                      </children>
                   </VBox>
                   
                   <VBox spacing="15.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <Label text="Credenciais do Administrador" textFill="#40C057">
+                        <Label text="Credenciais, Dono (Pessoa) &amp; Segurança" textFill="#40C057">
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>
                         </Label>
                         
-                        <GridPane hgap="10.0" vgap="12.0">
+                        <GridPane hgap="10.0" vgap="10.0">
                            <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" maxWidth="110.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="10.0" prefWidth="115.0" />
                               <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                            </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                              <RowConstraints minHeight="35.0" prefHeight="35.0" />
-                           </rowConstraints>
                            <children>
-                              <Label text="Nome Completo:" textFill="#495057" GridPane.rowIndex="0" />
-                              <TextField fx:id="txtNomeAdmin" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                              <Label text="Nome do Dono:" textFill="#495057" GridPane.rowIndex="0" />
+                              <TextField fx:id="txtNomeAdmin" promptText="Nome completo da pessoa" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                               
-                              <Label text="CPF:" textFill="#495057" GridPane.rowIndex="1" />
-                              <TextField fx:id="txtCpfAdmin" promptText="Apenas números" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="CPF do Dono:" textFill="#495057" GridPane.rowIndex="1" />
+                              <TextField fx:id="txtCpfAdmin" promptText="Apenas números" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               
-                              <Label text="Telefone Celular:" textFill="#495057" GridPane.rowIndex="2" />
-                              <TextField fx:id="txtTelefoneAdmin" promptText="(00) 90000-0000" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="Celular do Dono:" textFill="#495057" GridPane.rowIndex="2" />
+                              <TextField fx:id="txtTelefoneAdmin" promptText="WhatsApp / Celular" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               
                               <Label text="E-mail (Login):" textFill="#495057" GridPane.rowIndex="3" />
-                              <TextField fx:id="txtEmailAdmin" promptText="admin@empresa.com" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <TextField fx:id="txtEmailAdmin" promptText="admin@yat.com.br" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                               
-                              <Label text="Senha Mestra:" textFill="#495057" GridPane.rowIndex="4" />
-                              <PasswordField fx:id="txtSenhaAdmin" promptText="Mínimo 6 dígitos" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <Label text="Senha de Acesso:" textFill="#495057" GridPane.rowIndex="4" />
+                              <PasswordField fx:id="txtSenhaAdmin" promptText="Mínimo 6 caracteres" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                               
                               <Label text="Confirme a Senha:" textFill="#495057" GridPane.rowIndex="5" />
-                              <PasswordField fx:id="txtConfirmarSenhaAdmin" style="-fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <PasswordField fx:id="txtConfirmarSenhaAdmin" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              
+                              <Label text="Múltiplas Sessões:" textFill="#495057" GridPane.rowIndex="6" />
+                              <ComboBox fx:id="cbMultiplasSessoes" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              
+                              <Label text="Acesso Fora Empresa:" textFill="#495057" GridPane.rowIndex="7" />
+                              <ComboBox fx:id="cbAcessoForaEmpresa" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                            </children>
+                           <rowConstraints>
+                              <RowConstraints /> <RowConstraints /> <RowConstraints /> <RowConstraints />
+                              <RowConstraints /> <RowConstraints /> <RowConstraints /> <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                      </children>
                   </VBox>
@@ -136,7 +167,7 @@
             
             <HBox alignment="CENTER_RIGHT" prefHeight="50.0" style="-fx-border-color: #E9ECEF; -fx-border-width: 1 0 0 0; -fx-padding: 15 0 0 0;">
                <children>
-                  <Button fx:id="btnRegistrar" mnemonicParsing="false" onAction="#handleRegistrar" prefHeight="40.0" prefWidth="220.0" style="-fx-background-color: #228BE6; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-cursor: hand; -fx-background-radius: 4;" text="Inicializar Ecossistema" />
+                  <Button fx:id="btnRegistrar" mnemonicParsing="false" onAction="#handleRegistrar" prefHeight="40.0" prefWidth="250.0" style="-fx-background-color: #228BE6; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-cursor: hand; -fx-background-radius: 4;" text="Gravar e Inicializar Sistema" />
                </children>
             </HBox>
             

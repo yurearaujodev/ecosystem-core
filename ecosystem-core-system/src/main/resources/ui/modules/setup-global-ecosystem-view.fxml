@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToWidth="true" prefHeight="650.0" prefWidth="1100.0" style="-fx-background-color: #FFFFFF; -fx-background: #FFFFFF;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.yat.ecosystemcore.ui.modules.system.SetupGlobalEcosystemController">
+   <content>
+      <VBox spacing="25.0">
+         <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+         <children>
+            
+            <VBox spacing="5.0">
+               <children>
+                  <Label text="Setup Global do Ecossistema (Onboarding do Dono)" textFill="#1A1B1E">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <Label text="Inicialize os parâmetros globais, semeie os módulos core e crie a conta do Administrador Mestre." textFill="#909296" />
+               </children>
+            </VBox>
+            
+            <HBox spacing="25.0" VBox.vgrow="ALWAYS">
+               <children>
+                  
+                  <VBox spacing="15.0" HBox.hgrow="ALWAYS" style="-fx-border-color: #E9ECEF; -fx-border-width: 0 1 0 0; -fx-padding: 0 15 0 0;">
+                     <children>
+                        <Label text="1. Configurações Globais" textFill="#228BE6">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        
+                        <GridPane hgap="10.0" vgap="12.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="130.0" minWidth="10.0" prefWidth="120.0" />
+                              <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                           </columnConstraints>
+                           <children>
+                              <Label text="Plataforma:" textFill="#495057" GridPane.rowIndex="0" />
+                              <TextField fx:id="txtNomePlataforma" promptText="Ex: YAT Ecosystem" text="YAT Ecosystem Core" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                              
+                              <Label text="Ambiente:" textFill="#495057" GridPane.rowIndex="1" />
+                              <TextField fx:id="txtAmbiente" promptText="Ex: PRODUCTION" text="PRODUCTION" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              
+                              <Label text="Versão Inicial:" textFill="#495057" GridPane.rowIndex="2" />
+                              <TextField fx:id="txtVersaoInicial" editable="false" text="1.0.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                           </children>
+                        </GridPane>
+                     </children>
+                  </VBox>
+                  
+                  <VBox spacing="15.0" HBox.hgrow="ALWAYS" style="-fx-border-color: #E9ECEF; -fx-border-width: 0 1 0 0; -fx-padding: 0 15 0 0;">
+                     <children>
+                        <Label text="2. Conta do Administrador Mestre" textFill="#FD7E14">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        
+                        <GridPane hgap="10.0" vgap="12.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" prefWidth="80.0" />
+                              <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                           </columnConstraints>
+                           <children>
+                              <Label text="Nome Completo:" textFill="#495057" GridPane.rowIndex="0" />
+                              <TextField fx:id="txtNomeAdmin" promptText="Seu nome completo" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                              
+                              <Label text="E-mail (Login):" textFill="#495057" GridPane.rowIndex="1" />
+                              <TextField fx:id="txtEmailAdmin" promptText="Ex: admin@yat.com" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              
+                              <Label text="Senha Master:" textFill="#495057" GridPane.rowIndex="2" />
+                              <PasswordField fx:id="txtSenhaAdmin" promptText="Defina uma senha forte" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                           </children>
+                        </GridPane>
+                     </children>
+                  </VBox>
+                  
+                  <VBox prefWidth="300.0" spacing="15.0">
+                     <children>
+                        <Label text="3. Módulos Estruturais" textFill="#40C057">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        
+                        <ScrollPane fitToWidth="true" prefHeight="200.0" style="-fx-border-color: #CED4DA;">
+                           <content>
+                              <VBox fx:id="vboxModulosCatalogo" spacing="8.0" style="-fx-background-color: #FAFAFA;">
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </VBox>
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </VBox>
+                  
+               </children>
+            </HBox>
+            
+            <HBox alignment="CENTER_RIGHT" prefHeight="50.0" style="-fx-border-color: #E9ECEF; -fx-border-width: 1 0 0 0; -fx-padding: 15 0 0 0;">
+               <children>
+                  <Button fx:id="btnInicializar" mnemonicParsing="false" onAction="#handleInicializar" prefHeight="40.0" prefWidth="320.0" style="-fx-background-color: #40C057; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-cursor: hand; -fx-background-radius: 4;" text="Gravar Ecossistema e Criar Usuário" />
+               </children>
+            </HBox>
+            
+         </children>
+      </VBox>
+   </content>
+</ScrollPane>

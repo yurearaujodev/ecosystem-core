@@ -160,7 +160,7 @@ public class ConfiguracaoBancoController implements Initializable {
                         // ARQUITETURA PROFISSIONAL: Delega a navegação ao Navigator injetado
                         if (this.navigator != null) {
                             // Altere para a chave que você desejar redirecionar (ex: CADASTROS_EMPRESA ou HOME)
-                            this.navigator.navigatePara(MenuChave.HOME);
+                            this.navigator.navigatePara(MenuChave.DASHBOARD);
                         }
                     });
                 },

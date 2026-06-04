@@ -4,21 +4,13 @@ import br.com.yat.ecosystemcore.domain.entity.Empresa;
 import br.com.yat.ecosystemcore.repository.base.GenericDao;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class EmpresaRepository extends GenericDao<Empresa, Long> {
-
-    private static final String SQL_INSERT =
-            "INSERT INTO empresa (uuid_publico, tenant_id, razao_social, nome_fantasia, cnpj, "
-                    + "inscricao_estadual, telefone, logradouro, numero, bairro, cidade, estado, cep, ativo) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    private static final String SQL_FIND_BY_ID =
-            "SELECT * FROM empresa WHERE id = ? AND deleted_at IS NULL";
 
     public EmpresaRepository() {
         super("empresa", "id");
@@ -41,47 +33,70 @@ public class EmpresaRepository extends GenericDao<Empresa, Long> {
         e.setCidade(rs.getString("cidade"));
         e.setEstado(rs.getString("estado"));
         e.setCep(rs.getString("cep"));
+        e.setVersion(rs.getInt("version"));
         e.setAtivo(rs.getBoolean("ativo"));
         e.setCreatedAt(readLocalDateTime(rs, "created_at"));
+        e.setDeletedAt(readLocalDateTime(rs, "deleted_at"));
         return e;
     }
 
+    // Lista empresas do Tenant ativo que não foram excluídas
+    public List<Empresa> listarPorTenant(Connection conn, String tenantId) throws SQLException {
+        String sql = "SELECT * FROM empresa WHERE tenant_id = ? AND deleted_at IS NULL ORDER BY razao_social";
+        return executeQuery(conn, sql, tenantId);
+    }
+
+    // Insere usando seu método utilitário que captura a Primary Key auto-incrementada
     public Long insert(Connection conn, Empresa empresa) throws SQLException {
-        try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, empresa.getUuidPublico());
-            stmt.setString(2, empresa.getTenantId());
-            stmt.setString(3, empresa.getRazaoSocial());
-            stmt.setString(4, empresa.getNomeFantasia());
-            stmt.setString(5, empresa.getCnpj());
-            stmt.setString(6, empresa.getInscricaoEstadual());
-            stmt.setString(7, empresa.getTelefone());
-            stmt.setString(8, empresa.getLogradouro());
-            stmt.setString(9, empresa.getNumero());
-            stmt.setString(10, empresa.getBairro());
-            stmt.setString(11, empresa.getCidade());
-            stmt.setString(12, empresa.getEstado());
-            stmt.setString(13, empresa.getCep());
-            stmt.setBoolean(14, empresa.getAtivo() != null ? empresa.getAtivo() : true);
+        String sql = """
+            INSERT INTO empresa (uuid_publico, tenant_id, razao_social, nome_fantasia, cnpj, 
+                                 inscricao_estadual, telefone, logradouro, numero, bairro, cidade, estado, cep, ativo) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+        
+        String uuid = (empresa.getUuidPublico() != null) ? empresa.getUuidPublico() : UUID.randomUUID().toString();
+        Boolean ativo = (empresa.getAtivo() != null) ? empresa.getAtivo() : true;
 
-            stmt.executeUpdate();
-
-            try (ResultSet gk = stmt.getGeneratedKeys()) {
-                if (gk.next()) {
-                    return gk.getLong(1);
-                }
-                throw new SQLException("Erro ao obter ID gerado para Empresa.");
-            }
-        }
+        return executeInsertReturningId(conn, sql, 
+            uuid, empresa.getTenantId(), empresa.getRazaoSocial(), empresa.getNomeFantasia(),
+            empresa.getCnpj(), empresa.getInscricaoEstadual(), empresa.getTelefone(), 
+            empresa.getLogradouro(), empresa.getNumero(), empresa.getBairro(), 
+            empresa.getCidade(), empresa.getEstado(), empresa.getCep(), ativo
+        );
     }
 
-    /**
-     * Busca empresa ativa por id (login / contexto sem filtro tenant_id na query).
-     */
+    // Atualiza controlando a concorrência via bloqueio otimista (Versionamento)
+    public boolean update(Connection conn, Empresa empresa) throws SQLException {
+        String sql = """
+            UPDATE empresa SET razao_social = ?, nome_fantasia = ?, cnpj = ?, inscricao_estadual = ?, 
+                               telefone = ?, logradouro = ?, numero = ?, bairro = ?, cidade = ?, 
+                               estado = ?, cep = ?, ativo = ?, version = version + 1
+            WHERE id = ? AND tenant_id = ? AND version = ?
+        """;
+
+        int linhasAfetadas = executeUpdate(conn, sql,
+            empresa.getRazaoSocial(), empresa.getNomeFantasia(), empresa.getCnpj(), empresa.getInscricaoEstadual(),
+            empresa.getTelefone(), empresa.getLogradouro(), empresa.getNumero(), empresa.getBairro(),
+            empresa.getCidade(), empresa.getEstado(), empresa.getCep(), empresa.getAtivo(),
+            empresa.getId(), empresa.getTenantId(), empresa.getVersion()
+        );
+        
+        return linhasAfetadas > 0;
+    }
+
+    // Soft Delete refinado atualizando quem realizou a exclusão técnica (deleted_by)
+    public boolean softDelete(Connection conn, Long id, String tenantId, Long usuarioLogadoId) throws SQLException {
+        String sql = "UPDATE empresa SET deleted_at = CURRENT_TIMESTAMP, deleted_by = ? WHERE id = ? AND tenant_id = ? AND deleted_at IS NULL";
+        return executeUpdate(conn, sql, usuarioLogadoId, id, tenantId) > 0;
+    }
+
     public Optional<Empresa> findById(Connection conn, Long id) throws SQLException {
-        return executeQuerySingleEntity(conn, SQL_FIND_BY_ID, id);
+        String sql = "SELECT * FROM empresa WHERE id = ? AND deleted_at IS NULL";
+        return executeQuerySingleEntity(conn, sql, id);
     }
-
-    /** Alias mantido para compatibilidade com use cases existentes. */
+    
+    /** * Alias mantido para compatibilidade com o caso de uso de autenticação (AutenticacaoUseCase) 
+     */
     public Optional<Empresa> findEmpresaPorIdSemTenantId(Connection conn, Long id) throws SQLException {
         return findById(conn, id);
     }

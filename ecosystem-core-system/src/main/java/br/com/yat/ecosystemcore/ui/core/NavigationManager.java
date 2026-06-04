@@ -45,24 +45,46 @@ public class NavigationManager implements Navigator {
     }
 
     private void configurarRotas() {
+        // 🏠 Home
+ //       rotas.put(MenuChave.DASHBOARD, "/ui/modules/dashboard/DashboardView.fxml");
+        rotas.put(MenuChave.DASHBOARD, "/ui/modules/home.fxml");
 
-        rotas.put(MenuChave.HOME, "/ui/modules/home.fxml");
+        // 👥 Cadastros (Consulta + Novo)
+        rotas.put(MenuChave.CADASTROS_EMPRESAS, "/ui/modules/empresa-consulta-view.fxml");
+        rotas.put(MenuChave.CADASTROS_PESSOAS, "/ui/modules/pessoa-lista.fxml");
+        rotas.put(MenuChave.CADASTROS_USUARIOS, "/ui/modules/usuario-gerenciamento.fxml");
 
-        rotas.put(MenuChave.CADASTROS_EMPRESA, "/ui/modules/empresa/EmpresaView.fxml");
-        rotas.put(MenuChave.CADASTROS_PESSOA, "/ui/modules/pessoa/PessoaView.fxml");
-        rotas.put(MenuChave.CADASTROS_USUARIO, "/ui/modules/usuario/UsuarioView.fxml");
+        // 🔐 Segurança
+        rotas.put(MenuChave.SEGURANCA_PERFIS, "/ui/modules/seguranca/PerfilConsultaView.fxml");
+        rotas.put(MenuChave.SEGURANCA_PERMISSOES, "/ui/modules/seguranca/PermissaoConsultaView.fxml");
+        rotas.put(MenuChave.SEGURANCA_ABA_USUARIO_DETALHE, "/ui/modules/seguranca/UsuarioGerenciamentoAbasView.fxml"); // (Usuário x Empresa, Permissões Extras)
+        rotas.put(MenuChave.SEGURANCA_MFA, "/ui/modules/seguranca/MfaView.fxml");
+        rotas.put(MenuChave.SEGURANCA_ABA_SESSÕES_TENTATIVAS, "/ui/modules/seguranca/MonitoramentoSessoesAbasView.fxml"); // (Sessões, Tentativas, Dispositivos)
 
-        rotas.put(MenuChave.SEGURANCA_PERFIL, "/ui/modules/seguranca/PerfilView.fxml");
-        rotas.put(MenuChave.SEGURANCA_PERMISSAO, "/ui/modules/seguranca/PermissaoView.fxml");
+        // 🏢 Administração
+        rotas.put(MenuChave.ADMIN_TENANTS, "/ui/modules/administracao/TenantConsultaView.fxml");
+        rotas.put(MenuChave.ADMIN_ABA_CONFIG_TENANT, "/ui/modules/administracao/ConfiguracaoTenantAbasView.fxml"); // (Configs, Features, Parâmetros)
+        rotas.put(MenuChave.ADMIN_MODULOS, "/ui/modules/administracao/ModuloConsultaView.fxml");
+        rotas.put(MenuChave.ADMIN_MENUS, "/ui/modules/administracao/MenuConsultaView.fxml");
+        rotas.put(MenuChave.ADMIN_TENANT_MENUS, "/ui/modules/administracao/TenantMenusView.fxml");
 
-        rotas.put(MenuChave.ADMIN_TENANT_CONFIG, "/ui/modules/onboarding-tenant-view.fxml");
-        rotas.put(MenuChave.ADMIN_PARAMETROS, "/ui/modules/admin/ParametrosView.fxml");
+        // 🔔 Comunicação
+        rotas.put(MenuChave.COMUNICACAO_NOTIFICACOES, "/ui/modules/comunicacao/NotificacoesView.fxml");
 
+        // 📁 Documentos
+        rotas.put(MenuChave.DOCUMENTOS_ARQUIVOS, "/ui/modules/documentos/ArquivosView.fxml");
+
+        // 📜 Auditoria
+        rotas.put(MenuChave.AUDITORIA_ABA_PRINCIPAL, "/ui/modules/auditoria/AuditoriaAbasView.fxml"); // (Logs e Configuração Auditoria)
+
+        // ⚙ Sistema (Somente Consulta)
+        rotas.put(MenuChave.SISTEMA_CONFIGURACOES, "/ui/modules/sistema/ConfiguracoesGeraisView.fxml");
+        rotas.put(MenuChave.SISTEMA_JOBS, "/ui/modules/sistema/JobsConsultaView.fxml");
+        rotas.put(MenuChave.SISTEMA_OUTBOX_EVENTS, "/ui/modules/sistema/OutboxConsultaView.fxml");
+        rotas.put(MenuChave.SISTEMA_SCHEMA_VERSAO, "/ui/modules/sistema/SchemaVersaoView.fxml");
+
+        // Rotas Legadas / Auxiliares
         rotas.put(MenuChave.CONFIGURACAO_BANCO, "/ui/modules/configuracao-banco.fxml");
-
-        rotas.put(MenuChave.AUDITORIA_LOGS, "/ui/modules/auditoria/LogsView.fxml");
-        rotas.put(MenuChave.AUDITORIA_JOBS, "/ui/modules/auditoria/JobsView.fxml");
-
         rotas.put(MenuChave.FINANCEIRO_FLUXO, "/ui/modules/financeiro/FluxoCaixaView.fxml");
     }
 

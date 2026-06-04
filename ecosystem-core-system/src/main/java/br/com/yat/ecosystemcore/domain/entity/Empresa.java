@@ -20,9 +20,9 @@ public class Empresa {
     private Integer version;
     private Boolean ativo;
     private LocalDateTime createdAt;
+    private LocalDateTime deletedAt; // Adicionado para controle de auditoria de deleção
 
-    // Construtor Padrão
-    public Empresa() {}
+    public Empresa() {}	
 
     // Getters e Setters
     public Long getId() { return id; }
@@ -59,4 +59,6 @@ public class Empresa {
     public void setAtivo(Boolean ativo) { this.ativo = ativo; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getDeletedAt() { return deletedAt; }
+    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
 }

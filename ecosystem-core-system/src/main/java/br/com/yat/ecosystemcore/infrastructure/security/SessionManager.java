@@ -5,29 +5,34 @@ import br.com.yat.ecosystemcore.domain.entity.Tenant;
 import br.com.yat.ecosystemcore.domain.entity.Empresa;
 
 /**
- * Contexto global thread-safe da sessão do usuário logado.
- * Modificado para usar ThreadLocal, garantindo isolamento total entre Threads.
+ * Contexto global da sessão do usuário autenticado no ecossistema JavaFX.
  */
 public final class SessionManager {
-    private static final ThreadLocal<Usuario> usuarioLogado = new ThreadLocal<>();
-    private static final ThreadLocal<Tenant> tenantAtual = new ThreadLocal<>();
-    private static final ThreadLocal<Empresa> empresaFilial = new ThreadLocal<>();
+    private static Usuario usuarioLogado;
+    private static Tenant tenantAtual;
+    private static Empresa empresaFilial;
 
     private SessionManager() {} 
+    
+    public static void setEmpresaFilial(Empresa empresa) {
+        empresaFilial = empresa;
+    }
 
     public static void iniciarSessao(Usuario usuario, Tenant tenant, Empresa empresa) {
-        usuarioLogado.set(usuario);
-        tenantAtual.set(tenant);
-        empresaFilial.set(empresa);
+        usuarioLogado = usuario;
+        tenantAtual = tenant;
+        empresaFilial = empresa;
     }
 
     public static void encerrarSessao() {
-        usuarioLogado.remove();
-        tenantAtual.remove();
-        empresaFilial.remove();
+        usuarioLogado = null;
+        tenantAtual = null;
+        empresaFilial = null;
     }
 
-    public static Usuario getUsuarioLogado() { return usuarioLogado.get(); }
-    public static Tenant getTenantAtual() { return tenantAtual.get(); }
-    public static Empresa getEmpresaFilial() { return empresaFilial.get(); }
+    public static Usuario getUsuarioLogado() { return usuarioLogado; }
+    public static Tenant getTenantAtual() { return tenantAtual; }
+    public static Empresa getEmpresaFilial() { return empresaFilial; }
+    
+    public static boolean temEmpresaVinculada() { return empresaFilial != null; }
 }

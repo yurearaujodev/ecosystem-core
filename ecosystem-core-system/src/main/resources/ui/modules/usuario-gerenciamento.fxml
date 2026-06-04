@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="650.0" prefWidth="950.0" spacing="15.0" style="-fx-background-color: #F4F6F9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.yat.ecosystemcore.ui.modules.usuario.UsuarioController">
+   <children>
+      <VBox spacing="5.0">
+         <children>
+            <Label text="🔐 Credenciais &amp; Operadores Multiempresa" textFill="#2C3E50">
+               <font>
+                  <Font name="System Bold" size="22.0" />
+               </font>
+            </Label>
+            <Label text="Gerencie operadores do ecossistema e controle a quais filiais/empresas eles possuem acesso ativo." textFill="#7F8C8D" />
+         </children>
+      </VBox>
+
+      <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);">
+         <children>
+            <TextField fx:id="txtFiltroEmail" promptText="Filtrar por e-mail..." prefHeight="35.0" prefWidth="300.0" style="-fx-background-radius: 6;" />
+            <Button onAction="#onFiltrar" prefHeight="35.0" prefWidth="90.0" style="-fx-background-color: #34495E; -fx-text-fill: white; -fx-background-radius: 6; -fx-cursor: hand;" text="Filtrar" />
+            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+               <children>
+                  <Button onAction="#onNovoUsuario" prefHeight="35.0" style="-fx-background-color: #2ECC71; -fx-text-fill: white; -fx-background-radius: 6; -fx-cursor: hand;" text="➕ Cadastrar Operador" />
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+         </padding>
+      </HBox>
+
+      <SplitPane dividerPositions="0.6" orientation="VERTICAL" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+        <items>
+            <VBox spacing="5.0">
+               <children>
+                  <Label text="Operadores Cadastrados" textFill="#34495E" style="-fx-font-weight: bold;" />
+                  <TableView fx:id="tblUsuarios" VBox.vgrow="ALWAYS" style="-fx-background-radius: 6;">
+                    <columns>
+                      <TableColumn fx:id="colId" prefWidth="50.0" text="ID" />
+                      <TableColumn fx:id="colUuid" prefWidth="120.0" text="UUID Público" />
+                      <TableColumn fx:id="colEmail" prefWidth="250.0" text="E-mail Corporativo" />
+                      <TableColumn fx:id="colPessoaId" prefWidth="90.0" text="ID Pessoa" />
+                      <TableColumn fx:id="colStatus" prefWidth="90.0" text="Status" />
+                    </columns>
+                     <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                  </TableView>
+               </children>
+            </VBox>
+
+            <VBox spacing="5.0">
+               <children>
+                  <Label text="🏢 Empresas Autorizadas e Perfis de Acesso para o Operador Selecionado" textFill="#2980B9" style="-fx-font-weight: bold;" />
+                  <TableView fx:id="tblEmpresasVinculadas" VBox.vgrow="ALWAYS" style="-fx-background-radius: 6;">
+                    <columns>
+                      <TableColumn fx:id="colEmpresaId" prefWidth="100.0" text="ID Empresa" />
+                      <TableColumn fx:id="colEmpresaNome" prefWidth="350.0" text="Nome Fantasia da Unidade / Filial" />
+                      <TableColumn fx:id="colPerfilId" prefWidth="100.0" text="ID Perfil" />
+                      <TableColumn fx:id="colPerfilNome" prefWidth="200.0" text="Perfil / Nível de Acesso (RBAC)" />
+                    </columns>
+                     <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                  </TableView>
+               </children>
+               <padding><Insets top="10.0" /></padding>
+            </VBox>
+        </items>
+      </SplitPane>
+
+      <HBox alignment="CENTER_RIGHT" spacing="10.0">
+         <children>
+            <Button onAction="#onDeletarUsuario" prefHeight="35.0" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" text="🗑️ Remover Acesso" />
+            <Button onAction="#onAtualizarTabela" prefHeight="35.0" style="-fx-background-color: #3498DB; -fx-text-fill: white;" text="🔄 Sincronizar" />
+         </children>
+      </HBox>
+   </children>
+   <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+</VBox>

@@ -1,0 +1,77 @@
+/* Definições globais de fontes e fundo da aplicação */
+.root {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f8f9fa; /* Cinza bem claro de fundo */
+    -fx-text-fill: #2c3e50;
+}
+
+/* Customização dos TextFields (Inputs) */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 4px;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-padding: 6px 12px;
+    -fx-text-fill: #2c3e50;
+}
+
+.text-field:focused {
+    -fx-border-color: #3498db; /* Azul ao focar */
+    -fx-background-color: #ffffff;
+}
+
+/* Customização do ComboBox */
+.combo-box {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 4px;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+}
+
+.combo-box:focused {
+    -fx-border-color: #3498db;
+}
+
+/* Estilização das Labels */
+.label {
+    -fx-text-fill: #34495e;
+}
+
+/* 🚀 BOTÃO PRINCIPAL (Salvar Registro) */
+.btn-primary {
+    -fx-background-color: #2ecc71; /* Verde moderno */
+    -fx-background-radius: 4px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #27ae60; /* Verde mais escuro no hover */
+}
+
+.btn-primary:pressed {
+    -fx-background-color: #1e8449;
+}
+
+/* 🥈 BOTÃO SECUNDÁRIO (Cancelar) */
+.btn-secondary {
+    -fx-background-color: #e74c3c; /* Vermelho/Coral */
+    -fx-background-radius: 4px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #c0392b; /* Vermelho mais escuro no hover */
+}
+
+.btn-secondary:pressed {
+    -fx-background-color: #962d22;
+}

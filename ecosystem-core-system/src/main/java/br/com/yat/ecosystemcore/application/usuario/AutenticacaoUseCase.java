@@ -3,6 +3,7 @@ package br.com.yat.ecosystemcore.application.usuario;
 import br.com.yat.ecosystemcore.application.usuario.dto.SessaoDTO;
 import br.com.yat.ecosystemcore.domain.entity.*;
 import br.com.yat.ecosystemcore.infrastructure.database.TransactionManager;
+import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
 import br.com.yat.ecosystemcore.repository.empresa.EmpresaRepository;
 import br.com.yat.ecosystemcore.repository.tenant.TenantRepository;
 import br.com.yat.ecosystemcore.repository.usuario.SessaoUsuarioRepository;
@@ -26,7 +27,6 @@ public class AutenticacaoUseCase {
     }
 
     public SessaoDTO autenticar(String email, String senhaPura) throws SQLException {
-
         final SessaoDTO[] resposta = new SessaoDTO[1];
 
         TransactionManager.executeInTransaction(conn -> {
@@ -39,25 +39,28 @@ public class AutenticacaoUseCase {
             }
 
             Tenant tenant = tenantRepository.findTenantPorIdSemTenantId(conn, usuario.getTenantId())
-                .orElseThrow(() -> new SQLException("Tenant não encontrado."));
+                .orElseThrow(() -> new SQLException("Tenant escopo não encontrado no ecossistema."));
 
-            Empresa empresa = empresaRepository.findEmpresaPorIdSemTenantId(conn, usuario.getEmpresaPadraoId())
-                .orElseThrow(() -> new SQLException("Empresa não encontrada."));
+            Empresa empresa = null;
+            if (usuario.getEmpresaPadraoId() != null && usuario.getEmpresaPadraoId() > 0) {
+                empresa = empresaRepository.findEmpresaPorIdSemTenantId(conn, usuario.getEmpresaPadraoId())
+                    .orElse(null); 
+            }
 
             SessaoUsuario sessao = new SessaoUsuario();
-
-            String token64 =
-                    (UUID.randomUUID().toString() + UUID.randomUUID().toString())
-                            .replace("-", "")
-                            .substring(0, 64);
+            String token64 = (UUID.randomUUID().toString() + UUID.randomUUID().toString())
+                                .replace("-", "").substring(0, 64);
 
             sessao.setId(token64);
             sessao.setTenantId(usuario.getTenantId());
             sessao.setUsuarioId(usuario.getId());
-            sessao.setEmpresaAtivaId(usuario.getEmpresaPadraoId());
+            sessao.setEmpresaAtivaId(empresa != null ? empresa.getId() : null);
             sessao.setExpiraEm(LocalDateTime.now().plusHours(8));
 
             sessaoUsuarioRepository.insert(conn, sessao);
+
+            // 🛠️ VINCULAÇÃO DE SESSÃO GLOBAL PARA O JAVAFX
+            SessionManager.iniciarSessao(usuario, tenant, empresa);
 
             resposta[0] = new SessaoDTO(usuario, tenant, empresa);
         });

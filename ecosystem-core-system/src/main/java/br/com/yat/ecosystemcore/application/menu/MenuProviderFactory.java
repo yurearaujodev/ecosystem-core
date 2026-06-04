@@ -1,16 +1,13 @@
 package br.com.yat.ecosystemcore.application.menu;
 
-/**
- * Fábrica do provedor de menu. Troca de implementação centralizada para a futura leitura JDBC.
- */
+import br.com.yat.ecosystemcore.repository.menu.MenuSistemaRepository; // Ajuste para o seu pacote correto
+
 public final class MenuProviderFactory {
 
-    private MenuProviderFactory() {
-    }
+    private MenuProviderFactory() {}
 
     public static MenuProvider create() {
-        return new MenuProviderStub();
-        // Futuro:
-        // return new MenuProviderJdbc(new MenuSistemaRepositoryImpl());
+        // 🔄 DEFAUTE DEFINITIVO: Troca o Stub pela implementação dinâmica do Banco de Dados
+        return new MenuProviderJdbc(); 
     }
 }
