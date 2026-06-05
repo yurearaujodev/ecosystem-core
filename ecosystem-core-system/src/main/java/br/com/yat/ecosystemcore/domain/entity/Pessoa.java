@@ -13,7 +13,7 @@ public class Pessoa {
     private String telefone;
     private boolean ativo;
     
-    // CAMPOS QUE ESTAVAM FALTANDO (Auditoria e Versão):
+    // CAMPOS DE AUDITORIA E VERSÃO:
     private Integer version;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -24,7 +24,7 @@ public class Pessoa {
 
     public Pessoa() {}
 
-    // Getters e Setters existentes
+    // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getUuidPublico() { return uuidPublico; }
@@ -44,7 +44,6 @@ public class Pessoa {
     public boolean isAtivo() { return ativo; }
     public void setAtivo(boolean ativo) { this.ativo = ativo; }
 
-    // Getters e Setters dos novos campos
     public Integer getVersion() { return version; }
     public void setVersion(Integer version) { this.version = version; }
     public LocalDateTime getCreatedAt() { return createdAt; }
@@ -59,4 +58,13 @@ public class Pessoa {
     public void setUpdatedBy(Long updatedBy) { this.updatedBy = updatedBy; }
     public Long getDeletedBy() { return deletedBy; }
     public void setDeletedBy(Long deletedBy) { this.deletedBy = deletedBy; }
+    
+    /**
+     * 🔥 RESOLUÇÃO DO ENDEREÇO DE MEMÓRIA
+     * Faz com que qualquer componente visual nativo mostre o nome da pessoa de forma limpa.
+     */
+    @Override
+    public String toString() {
+        return this.nomeRazao != null ? this.nomeRazao : "";
+    }
 }

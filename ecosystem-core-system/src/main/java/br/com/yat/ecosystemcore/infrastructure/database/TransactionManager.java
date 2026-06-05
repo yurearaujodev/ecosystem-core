@@ -5,28 +5,15 @@ import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Gerencia transações JDBC por thread, vinculando uma conexão do pool ao escopo
- * de {@link #executeInTransaction(TransactionalOperation)}.
- * <p>
- * Fora de uma transação ativa, {@link #getConnection()} delega ao pool e o
- * chamador deve fechar a conexão (try-with-resources). Dentro de uma transação,
- * retorna a conexão transacional — não deve ser fechada pelo chamador.
- * </p>
- */
 public final class TransactionManager {
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
-
     private static final ThreadLocal<TransactionContext> transactionContext = new ThreadLocal<>();
 
     private TransactionManager() {
         throw new AssertionError("Classe utilitária não deve ser instanciada");
     }
 
-    /**
-     * Fornece a conexão da transação ativa na thread atual ou abre uma nova do pool.
-     */
     public static Connection getConnection() throws SQLException {
         TransactionContext ctx = transactionContext.get();
         if (ctx != null && isUsable(ctx.connection)) {
@@ -36,29 +23,44 @@ public final class TransactionManager {
     }
 
     /**
-     * Executa um bloco garantindo atomicidade (commit ou rollback).
-     * Chamadas aninhadas na mesma thread reutilizam a conexão sem novo begin/commit.
+     * ⚡ AGORA RETORNA VALOR! Executa um bloco garantindo atomicidade (commit ou rollback).
      */
-    public static void executeInTransaction(TransactionalOperation operation) throws SQLException {
+    public static <T> T executeInTransaction(TransactionalSupplier<T> operation) throws SQLException {
         TransactionContext existing = transactionContext.get();
+        
+        // Se já existe uma transação rodando na thread atual (Aninhamento)
         if (existing != null) {
             if (isUsable(existing.connection)) {
-                executeNested(existing, operation);
-                return;
+                return executeNested(existing, operation);
             }
             transactionContext.remove();
             logger.warn("Contexto transacional obsoleto removido da thread atual.");
         }
 
+        // Nova transação (Raiz)
         try (Connection conn = ConnectionFactory.getConnection()) {
-            transactionContext.set(new TransactionContext(conn));
+            TransactionContext newCtx = new TransactionContext(conn);
+            transactionContext.set(newCtx);
+            
             try {
                 ConnectionFactory.beginTransaction(conn);
-                operation.execute(conn);
+                
+                T result = operation.execute(conn);
+                
+                // 🛡️ SUPORTE A ROLLBACK ONLY: Mesmo que a exceção externa seja capturada,
+                // se qualquer bloco interno marcou como rollbackOnly, nós dropamos a transação inteira.
+                if (newCtx.rollbackOnly) {
+                    logger.warn("Transação raiz marcada como 'rollbackOnly'. Executando rollback forçado.");
+                    safeRollback(conn);
+                    throw new SQLException("Transação abortada: um bloco interno falhou e marcou rollbackOnly.");
+                }
+
                 ConnectionFactory.commitTransaction(conn);
                 logger.debug("Transação commitada com sucesso.");
+                return result;
+
             } catch (Exception e) {
-                logger.error("Erro detectado durante a transação. Executando rollback.", e);
+                logger.error("Erro detectado na transação raiz. Executando rollback.", e);
                 safeRollback(conn);
                 throw toSqlException(e);
             } finally {
@@ -67,11 +69,23 @@ public final class TransactionManager {
         }
     }
 
-    private static void executeNested(TransactionContext ctx, TransactionalOperation operation)
-            throws SQLException {
+    /**
+     * ⚡ NOVO MÉTODO: Executa um bloco transacional que NÃO possui retorno (void).
+     * Ele reaproveita toda a lógica do método principal escondendo o 'return null' dentro da infraestrutura.
+     */
+    public static void executeInTransaction(TransactionalRunnable operation) throws SQLException {
+        executeInTransaction(conn -> {
+            operation.execute(conn);
+            return null;
+        });
+    }
+
+    private static <T> T executeNested(TransactionContext ctx, TransactionalSupplier<T> operation) throws SQLException {
         try {
-            operation.execute(ctx.connection);
+            return operation.execute(ctx.connection);
         } catch (Exception e) {
+            // 🚨 Se a operação aninhada falhar, marca o contexto inteiro para a morte
+            ctx.rollbackOnly = true;
             throw toSqlException(e);
         }
     }
@@ -85,9 +99,7 @@ public final class TransactionManager {
     }
 
     private static boolean isUsable(Connection conn) {
-        if (conn == null) {
-            return false;
-        }
+        if (conn == null) return false;
         try {
             return !conn.isClosed();
         } catch (SQLException e) {
@@ -103,16 +115,30 @@ public final class TransactionManager {
         return new SQLException("Operação desfeita devido a uma falha no processamento.", cause);
     }
 
+    // 📋 Contexto interno expandido com a flag de segurança
     private static final class TransactionContext {
         final Connection connection;
+        boolean rollbackOnly = false; // Flag protetora estilo Spring
 
         TransactionContext(Connection connection) {
             this.connection = connection;
         }
     }
 
+    /**
+     * Nova interface funcional que substitui o antigo Runnable/Operation, 
+     * agora permitindo retornos de DTOs ou Entidades diretamente.
+     */
     @FunctionalInterface
-    public interface TransactionalOperation {
+    public interface TransactionalSupplier<T> {
+        T execute(Connection conn) throws Exception;
+    }
+
+    /**
+     * ⚡ NOVA INTERFACE: Representa uma operação transacional sem retorno.
+     */
+    @FunctionalInterface
+    public interface TransactionalRunnable {
         void execute(Connection conn) throws Exception;
     }
 }

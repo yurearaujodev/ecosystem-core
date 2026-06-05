@@ -71,8 +71,9 @@
 
       <HBox alignment="CENTER_RIGHT" spacing="10.0">
          <children>
-            <Button onAction="#onDeletarUsuario" prefHeight="35.0" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" text="🗑️ Remover Acesso" />
-            <Button onAction="#onAtualizarTabela" prefHeight="35.0" style="-fx-background-color: #3498DB; -fx-text-fill: white;" text="🔄 Sincronizar" />
+            <Button onAction="#onAlterarUsuario" prefHeight="35.0" style="-fx-background-color: #F39C12; -fx-text-fill: white; -fx-background-radius: 6; -fx-cursor: hand;" text="✏️ Alterar Operador" />
+            <Button onAction="#onDeletarUsuario" prefHeight="35.0" style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-background-radius: 6; -fx-cursor: hand;" text="🗑️ Remover Acesso" />
+            <Button onAction="#onAtualizarTabela" prefHeight="35.0" style="-fx-background-color: #3498DB; -fx-text-fill: white; -fx-background-radius: 6; -fx-cursor: hand;" text="🔄 Sincronizar" />
          </children>
       </HBox>
    </children>

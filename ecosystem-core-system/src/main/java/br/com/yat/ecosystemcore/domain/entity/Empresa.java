@@ -20,7 +20,12 @@ public class Empresa {
     private Integer version;
     private Boolean ativo;
     private LocalDateTime createdAt;
-    private LocalDateTime deletedAt; // Adicionado para controle de auditoria de deleção
+    private LocalDateTime deletedAt;
+    
+    // Campos de Auditoria (Essenciais para o seu Banco)
+    private Long createdBy;
+    private Long updatedBy;
+    private Long deletedBy;
 
     public Empresa() {}	
 
@@ -61,4 +66,12 @@ public class Empresa {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getDeletedAt() { return deletedAt; }
     public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
+    
+    // Auditoria
+    public Long getCreatedBy() { return createdBy; }
+    public void setCreatedBy(Long createdBy) { this.createdBy = createdBy; }
+    public Long getUpdatedBy() { return updatedBy; }
+    public void setUpdatedBy(Long updatedBy) { this.updatedBy = updatedBy; }
+    public Long getDeletedBy() { return deletedBy; }
+    public void setDeletedBy(Long deletedBy) { this.deletedBy = deletedBy; }
 }

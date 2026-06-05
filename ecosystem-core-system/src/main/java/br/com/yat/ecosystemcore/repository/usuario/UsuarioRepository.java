@@ -23,74 +23,65 @@ public class UsuarioRepository extends GenericDao<Usuario, Long> {
         u.setEmpresaPadraoId(rs.getObject("empresa_padrao_id") != null ? rs.getLong("empresa_padrao_id") : null);
         u.setEmail(rs.getString("email"));
         u.setSenhaHash(rs.getString("senha_hash"));
+        u.setMacAddressAutorizado(rs.getString("mac_address_autorizado"));
         u.setTentativasLogin(rs.getInt("tentativas_login"));
         u.setBloqueadoAte(readLocalDateTime(rs, "bloqueado_ate"));
         u.setUltimoAcesso(readLocalDateTime(rs, "ultimo_acesso"));
         u.setStatus(rs.getString("status"));
         u.setVersion(rs.getInt("version"));
+
+        // Novos campos de Auditoria e LGPD
+        u.setCreatedAt(readLocalDateTime(rs, "created_at"));
+        u.setUpdatedAt(readLocalDateTime(rs, "updated_at"));
+        u.setDeletedAt(readLocalDateTime(rs, "deleted_at"));
+        
+        u.setCreatedBy(rs.getObject("created_by") != null ? rs.getLong("created_by") : null);
+        u.setUpdatedBy(rs.getObject("updated_by") != null ? rs.getLong("updated_by") : null);
+        u.setDeletedBy(rs.getObject("deleted_by") != null ? rs.getLong("deleted_by") : null);
+        
+        u.setConsentimentoDados(rs.getBoolean("consentimento_dados"));
+        u.setTermoAceitoEm(readLocalDateTime(rs, "termo_aceito_em"));
+        u.setVersaoTermo(rs.getString("versao_termo"));
+        u.setAnonimizadoEm(readLocalDateTime(rs, "anonimizado_em"));
+
         return u;
     }
-
+    
     public Long insert(Connection conn, Usuario usuario, Long usuarioLogadoId) throws SQLException {
         String sql = """
-            INSERT INTO usuario (uuid_publico, tenant_id, pessoa_id, empresa_padrao_id, email, 
-                                 senha_hash, status, version, created_by) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)
-        """;
+                INSERT INTO usuario (uuid_publico, tenant_id, pessoa_id, empresa_padrao_id, email, 
+                                     senha_hash, mac_address_autorizado, status, version, created_by, 
+                                     consentimento_dados, versao_termo) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)
+            """;
         Long id = executeInsertReturningId(conn, sql, 
-            usuario.getUuidPublico(),
-            usuario.getTenantId(),
-            usuario.getPessoaId(),
-            usuario.getEmpresaPadraoId(),
-            usuario.getEmail(),
-            usuario.getSenhaHash(),
-            usuario.getStatus() != null ? usuario.getStatus() : "ACTIVE",
-            usuarioLogadoId // Vincula quem realizou a criação do acesso
-        );
-
-        if (id == null) {
-            throw new SQLException("Erro ao obter ID gerado para Usuário.");
-        }
+                usuario.getUuidPublico(), usuario.getTenantId(), usuario.getPessoaId(),
+                usuario.getEmpresaPadraoId(), usuario.getEmail(), usuario.getSenhaHash(),
+                usuario.getMacAddressAutorizado(), // ADICIONE ISSO
+                usuario.getStatus() != null ? usuario.getStatus() : "ACTIVE",
+                usuarioLogadoId,
+                usuario.isConsentimentoDados(),
+                usuario.getVersaoTermo()
+            );
         return id;
     }
     
-    public Long insert(Connection conn, Usuario usuario) throws SQLException {
-        String sql = """
-            INSERT INTO usuario (uuid_publico, tenant_id, pessoa_id, empresa_padrao_id, email, senha_hash, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """;
-        return executeInsertReturningId(conn, sql, 
-            usuario.getUuidPublico(),
-            usuario.getTenantId(),
-            usuario.getPessoaId(),
-            usuario.getEmpresaPadraoId(),
-            usuario.getEmail(),
-            usuario.getSenhaHash(),
-            usuario.getStatus() != null ? usuario.getStatus() : "ACTIVE"
-        );
-    }
-
     public void update(Connection conn, Usuario usuario, Long usuarioLogadoId) throws SQLException {
         String sql = """
             UPDATE usuario SET empresa_padrao_id = ?, email = ?, senha_hash = ?, status = ?, 
-                               version = version + 1, updated_by = ?
+                               mac_address_autorizado = ?, updated_by = ?, version = version + 1, 
+                               consentimento_dados = ?, termo_aceito_em = ?
             WHERE id = ? AND tenant_id = ? AND version = ? AND deleted_at IS NULL
         """;
         
         int rows = executeUpdate(conn, sql, 
-            usuario.getEmpresaPadraoId(),
-            usuario.getEmail(),
-            usuario.getSenhaHash(),
-            usuario.getStatus(),
-            usuarioLogadoId,
-            usuario.getId(),
-            usuario.getTenantId(),
-            usuario.getVersion() // Proteção de concorrência
+            usuario.getEmpresaPadraoId(), usuario.getEmail(), usuario.getSenhaHash(), 
+            usuario.getStatus(), usuario.getMacAddressAutorizado(), usuarioLogadoId, // ADICIONE ISSO
+            usuario.isConsentimentoDados(), usuario.getTermoAceitoEm(), 
+            usuario.getId(), usuario.getTenantId(), usuario.getVersion()
         );
 
-        if (rows == 0) {
-            throw new SQLException("Falha ao atualizar usuário: Registro não encontrado ou erro de concorrência.");
-        }
+        if (rows == 0) throw new SQLException("Erro de concorrência ao atualizar usuário.");
     }
 
     public List<Usuario> findAll(Connection conn, String tenantId) throws SQLException {
@@ -112,93 +103,31 @@ public class UsuarioRepository extends GenericDao<Usuario, Long> {
         return executeUpdate(conn, sql, usuarioLogadoId, id, tenantId) > 0;
     }
 
-    
-    /**
-     * Busca um usuário ativo pelo e-mail informado para o fluxo de login.
-     */
-    public Optional<Usuario> findByEmail(Connection conn, String email) throws SQLException {
-        String sql = "SELECT * FROM usuario WHERE email = ? AND status = 'ACTIVE'";
+public void incrementarTentativasFalhas(Connection conn, Long usuarioId, String tenantId) throws SQLException {
+        String sql = """
+            UPDATE usuario 
+            SET tentativas_login = tentativas_login + 1,
+                bloqueado_ate = CASE WHEN tentativas_login + 1 >= 5 THEN DATE_ADD(NOW(), INTERVAL 15 MINUTE) ELSE NULL END,
+                version = version + 1
+            WHERE id = ? AND tenant_id = ?
+        """;
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, email);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapResultSetToEntity(rs));
-                }
-            }
+            stmt.setLong(1, usuarioId);
+            stmt.setString(2, tenantId);
+            stmt.executeUpdate();
         }
-        return Optional.empty();
+    }
+
+    public void resetControleAcesso(Connection conn, Long usuarioId, String tenantId) throws SQLException {
+        String sql = """
+            UPDATE usuario 
+            SET tentativas_login = 0, bloqueado_ate = NULL, version = version + 1 
+            WHERE id = ? AND tenant_id = ?
+        """;
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, usuarioId);
+            stmt.setString(2, tenantId);
+            stmt.executeUpdate();
+        }
     }
 }
-
-//package br.com.yat.ecosystemcore.repository.usuario;
-//
-//import br.com.yat.ecosystemcore.domain.entity.Usuario;
-//import br.com.yat.ecosystemcore.repository.base.GenericDao;
-//
-//import java.sql.*;
-//import java.util.Optional;
-//
-//public class UsuarioRepository extends GenericDao<Usuario, Long> {
-//
-//    public UsuarioRepository() {
-//        super("usuario", "id");
-//    }
-//
-//    @Override
-//    protected Usuario mapResultSetToEntity(ResultSet rs) throws SQLException {
-//        Usuario u = new Usuario();
-//        u.setId(rs.getLong("id"));
-//        u.setUuidPublico(rs.getString("uuid_publico"));
-//        u.setTenantId(rs.getString("tenant_id"));
-//        u.setPessoaId(rs.getLong("pessoa_id"));
-//        u.setEmpresaPadraoId(rs.getObject("empresa_padrao_id") != null ? rs.getLong("empresa_padrao_id") : null);
-//        u.setEmail(rs.getString("email"));
-//        u.setSenhaHash(rs.getString("senha_hash"));
-//        u.setTentativasLogin(rs.getInt("tentativas_login"));
-//        u.setBloqueadoAte(readLocalDateTime(rs, "bloqueado_ate"));
-//        u.setUltimoAcesso(readLocalDateTime(rs, "ultimo_acesso"));
-//        u.setStatus(rs.getString("status"));
-//        u.setVersion(rs.getInt("version"));
-//        return u;
-//    }
-//
-//    public Long insert(Connection conn, Usuario usuario) throws SQLException {
-//        String sql = """
-//            INSERT INTO usuario (uuid_publico, tenant_id, pessoa_id, empresa_padrao_id, email, senha_hash, status) 
-//            VALUES (?, ?, ?, ?, ?, ?, ?)
-//        """;
-//        return executeInsertReturningId(conn, sql, 
-//            usuario.getUuidPublico(),
-//            usuario.getTenantId(),
-//            usuario.getPessoaId(),
-//            usuario.getEmpresaPadraoId(),
-//            usuario.getEmail(),
-//            usuario.getSenhaHash(),
-//            usuario.getStatus() != null ? usuario.getStatus() : "ACTIVE"
-//        );
-//    }
-//
-//    /**
-//     * Busca um usuário ativo pelo e-mail isolando estritamente pelo Tenant ID corporativo.
-//     */
-//    public Optional<Usuario> findByEmailETenant(Connection conn, String email, String tenantId) throws SQLException {
-//        String sql = "SELECT * FROM usuario WHERE email = ? AND tenant_id = ? AND status = 'ACTIVE' AND deleted_at IS NULL";
-//        return executeQuerySingleEntity(conn, sql, email, tenantId);
-//    }
-//    
-//    /**
-//     * Busca um usuário ativo pelo e-mail informado para o fluxo de login.
-//     */
-//    public Optional<Usuario> findByEmail(Connection conn, String email) throws SQLException {
-//        String sql = "SELECT * FROM usuario WHERE email = ? AND status = 'ACTIVE'";
-//        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-//            stmt.setString(1, email);
-//            try (ResultSet rs = stmt.executeQuery()) {
-//                if (rs.next()) {
-//                    return Optional.of(mapResultSetToEntity(rs));
-//                }
-//            }
-//        }
-//        return Optional.empty();
-//    }
-//}

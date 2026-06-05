@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="br.com.yat.ecosystemcore.ui.modules.perfil.UsuarioGerenciamentoAbasController"
+      VBox.vgrow="ALWAYS">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    </padding>
+
+    <HBox spacing="15.0" alignment="CENTER_LEFT" style="-fx-background-color: #f4f4f4; -fx-padding: 10; -fx-background-radius: 5;">
+        <Label text="Usuário em Edição:" style="-fx-font-weight: bold;"/>
+        <ComboBox fx:id="comboUsuarios" promptText="Selecione um Usuário..." prefWidth="300.0"/>
+    </HBox>
+
+    <TabPane fx:id="tabPaneCentral" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" disable="true">
+        <tabs>
+            <Tab text="Vínculos com Empresas &amp; Perfis">
+                <VBox spacing="10.0">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <ComboBox fx:id="comboEmpresas" promptText="Selecionar Empresa" prefWidth="200.0"/>
+                        <ComboBox fx:id="comboPerfis" promptText="Atribuir Perfil" prefWidth="200.0"/>
+                        <Button text="Adicionar Vínculo" onAction="#handleAdicionarVinculo" style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+                    </HBox>
+                    <TableView fx:id="tableVinculos" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colEmpresaNome" text="Empresa / Filial" prefWidth="250.0"/>
+                            <TableColumn fx:id="colPerfilNome" text="Perfil RBAC" prefWidth="200.0"/>
+                            <TableColumn fx:id="colAcoes" text="Ações" prefWidth="100.0"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <Tab text="Permissões Adicionais (Overriding)">
+                <VBox spacing="10.0">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <Label text="Selecione permissões específicas concedidas diretamente a este indivíduo (independente do Perfil):" wrapText="true"/>
+                    <ListView fx:id="listViewPermissoesExtras" VBox.vgrow="ALWAYS"/>
+                </VBox>
+            </Tab>
+
+            <Tab text="Políticas e Restrições de Acesso">
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+                    <VBox spacing="15.0">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+                        </padding>
+                        <CheckBox fx:id="chkRequerNovaSenha" text="Exigir troca de senha no próximo login (Forçar reset de credencial)"/>
+                        <CheckBox fx:id="chkAceitaForaEmpresa" text="Permitir autenticação fora da rede física / IP corporativo local"/>
+                        <CheckBox fx:id="chkMultiplasSessoes" text="Permitir múltiplas sessões simultâneas concorrentes na mesma conta"/>
+                        
+                        <VBox spacing="5.0">
+                            <Label text="Fixar Endereço IP Estático Obrigatório (Deixe vazio para dinâmico):" style="-fx-font-weight: bold;"/>
+                            <TextField fx:id="txtIpEstatico" promptText="Ex: 192.168.1.100" maxWidth="300.0"/>
+                        </VBox>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+        </tabs>
+    </TabPane>
+
+    <HBox spacing="10.0" alignment="CENTER_RIGHT">
+        <ProgressIndicator fx:id="progressLoader" prefWidth="25.0" prefHeight="25.0" visible="false"/>
+        <Button text="Cancelar" onAction="#handleCancelar" style="-fx-min-width: 100;"/>
+        <Button fx:id="btnSalvar" text="Salvar Modificações" onAction="#handleSalvar" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-min-width: 150; -fx-font-weight: bold;"/>
+    </HBox>
+</VBox>

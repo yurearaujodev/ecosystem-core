@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15.0" style="-fx-background-color: #f8f9fa;" stylesheets="@global.css" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="br.com.yat.ecosystemcore.ui.modules.perfil.PerfilCadastroController"
+      prefWidth="460.0" prefHeight="420.0">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <VBox spacing="4.0">
+        <Label fx:id="lblTitulo" text="Cadastrar Novo Perfil" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #212529;" />
+        <Label text="Campos assinalados com (*) são de preenchimento obrigatório." style="-fx-font-size: 11px; -fx-text-fill: #6c757d;" />
+    </VBox>
+    
+    <Separator />
+
+    <VBox spacing="12.0" VBox.vgrow="ALWAYS">
+        <VBox spacing="5.0">
+            <Label text="Nome do Perfil *" style="-fx-font-weight: bold;" />
+            <TextField fx:id="txtNome" promptText="Ex: Administrador de Filial" prefHeight="35.0" />
+        </VBox>
+
+        <VBox spacing="5.0">
+            <Label text="Chave Identificadora (Única) *" style="-fx-font-weight: bold;" />
+            <TextField fx:id="txtChave" promptText="Ex: ADMIN_FILIAL" prefHeight="35.0" />
+        </VBox>
+
+        <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+            <Label text="Descrição de Limites de Acesso" style="-fx-font-weight: bold;" />
+            <TextArea fx:id="txtDescricao" promptText="Descreva os papéis operacionais deste perfil..." 
+                      wrapText="true" VBox.vgrow="ALWAYS" />
+        </VBox>
+    </VBox>
+
+    <Separator />
+
+    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+        <Button fx:id="btnExcluir" text="🗑️ Excluir Perfil" onAction="#onExcluir" style="-fx-background-color: #C92A2A; -fx-text-fill: white;" prefHeight="35.0" visible="false"/>
+        <Pane HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnCancelar" text="Cancelar" onAction="#onCancelar" prefHeight="35.0" prefWidth="90.0" />
+        <Button fx:id="btnSalvar" text="💾 Salvar Perfil" onAction="#onSalvar" prefHeight="35.0" prefWidth="130.0"
+                style="-fx-background-color: #1A73E8; -fx-text-fill: white; -fx-font-weight: bold;" />
+    </HBox>
+</VBox>

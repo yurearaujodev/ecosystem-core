@@ -8,12 +8,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class AppExecutors {
     
     private static final AtomicInteger threadNumber = new AtomicInteger(1);
-    private static final ExecutorService DATABASE_EXECUTOR = Executors.newFixedThreadPool(4, runnable -> {
-        Thread thread = new Thread(runnable);
-        thread.setDaemon(true);
-        thread.setName("db-pool-thread-" + threadNumber.getAndIncrement());
-        return thread;
-    });
+private static final int DATABASE_POOL_SIZE =
+        Math.max(4, Runtime.getRuntime().availableProcessors());
+
+   private static final ExecutorService DATABASE_EXECUTOR =
+        Executors.newFixedThreadPool(
+                DATABASE_POOL_SIZE,
+                runnable -> {
+                    Thread thread = new Thread(runnable);
+                    thread.setDaemon(true);
+                    thread.setName(
+                            "db-pool-thread-" +
+                            threadNumber.getAndIncrement());
+                    return thread;
+                });
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(AppExecutors::shutdown, "shutdown-executors-hook"));

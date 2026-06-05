@@ -13,6 +13,9 @@ public class EmpresaUsuarioDetalheDTO {
         this.perfilId = perfilId;
         this.perfilNome = perfilNome;
     }
+    
+    public EmpresaUsuarioDetalheDTO() {
+    }
 
     // Getters e Setters para o JavaFX conseguir ler os valores via PropertyValueFactory
     public Long getEmpresaId() { return empresaId; }
@@ -26,4 +29,9 @@ public class EmpresaUsuarioDetalheDTO {
 
     public String getPerfilNome() { return perfilNome; }
     public void setPerfilNome(String perfilNome) { this.perfilNome = perfilNome; }
+    
+    @Override
+    public String toString() {
+        return this.empresaNome;
+    }
 }

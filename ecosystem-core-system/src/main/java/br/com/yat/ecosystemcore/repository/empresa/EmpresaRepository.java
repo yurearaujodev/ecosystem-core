@@ -37,6 +37,9 @@ public class EmpresaRepository extends GenericDao<Empresa, Long> {
         e.setAtivo(rs.getBoolean("ativo"));
         e.setCreatedAt(readLocalDateTime(rs, "created_at"));
         e.setDeletedAt(readLocalDateTime(rs, "deleted_at"));
+        e.setCreatedBy(rs.getLong("created_by"));
+        e.setUpdatedBy(rs.getLong("updated_by"));
+        e.setDeletedBy(rs.getLong("deleted_by"));
         return e;
     }
 
@@ -48,36 +51,35 @@ public class EmpresaRepository extends GenericDao<Empresa, Long> {
 
     // Insere usando seu método utilitário que captura a Primary Key auto-incrementada
     public Long insert(Connection conn, Empresa empresa) throws SQLException {
-        String sql = """
-            INSERT INTO empresa (uuid_publico, tenant_id, razao_social, nome_fantasia, cnpj, 
-                                 inscricao_estadual, telefone, logradouro, numero, bairro, cidade, estado, cep, ativo) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
-        
+    	String sql = """
+    		    INSERT INTO empresa (uuid_publico, tenant_id, razao_social, nome_fantasia, cnpj, 
+    		                         inscricao_estadual, telefone, logradouro, numero, bairro, 
+    		                         cidade, estado, cep, ativo, created_by) 
+    		    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    		""";     
         String uuid = (empresa.getUuidPublico() != null) ? empresa.getUuidPublico() : UUID.randomUUID().toString();
         Boolean ativo = (empresa.getAtivo() != null) ? empresa.getAtivo() : true;
 
-        return executeInsertReturningId(conn, sql, 
-            uuid, empresa.getTenantId(), empresa.getRazaoSocial(), empresa.getNomeFantasia(),
-            empresa.getCnpj(), empresa.getInscricaoEstadual(), empresa.getTelefone(), 
-            empresa.getLogradouro(), empresa.getNumero(), empresa.getBairro(), 
-            empresa.getCidade(), empresa.getEstado(), empresa.getCep(), ativo
-        );
+        return executeInsertReturningId(conn, sql, uuid, empresa.getTenantId(), 
+        	    empresa.getRazaoSocial(), empresa.getNomeFantasia(), empresa.getCnpj(), 
+        	    empresa.getInscricaoEstadual(), empresa.getTelefone(), empresa.getLogradouro(), 
+        	    empresa.getNumero(), empresa.getBairro(), empresa.getCidade(), 
+        	    empresa.getEstado(), empresa.getCep(), ativo, empresa.getCreatedBy());
     }
 
     // Atualiza controlando a concorrência via bloqueio otimista (Versionamento)
     public boolean update(Connection conn, Empresa empresa) throws SQLException {
-        String sql = """
-            UPDATE empresa SET razao_social = ?, nome_fantasia = ?, cnpj = ?, inscricao_estadual = ?, 
-                               telefone = ?, logradouro = ?, numero = ?, bairro = ?, cidade = ?, 
-                               estado = ?, cep = ?, ativo = ?, version = version + 1
-            WHERE id = ? AND tenant_id = ? AND version = ?
-        """;
+    	String sql = """
+    		    UPDATE empresa SET razao_social = ?, nome_fantasia = ?, cnpj = ?, inscricao_estadual = ?, 
+    		                       telefone = ?, logradouro = ?, numero = ?, bairro = ?, cidade = ?, 
+    		                       estado = ?, cep = ?, ativo = ?, updated_by = ?, version = version + 1
+    		    WHERE id = ? AND tenant_id = ? AND version = ?
+    		""";
 
         int linhasAfetadas = executeUpdate(conn, sql,
             empresa.getRazaoSocial(), empresa.getNomeFantasia(), empresa.getCnpj(), empresa.getInscricaoEstadual(),
             empresa.getTelefone(), empresa.getLogradouro(), empresa.getNumero(), empresa.getBairro(),
-            empresa.getCidade(), empresa.getEstado(), empresa.getCep(), empresa.getAtivo(),
+            empresa.getCidade(), empresa.getEstado(), empresa.getCep(), empresa.getAtivo(),empresa.getUpdatedBy(),
             empresa.getId(), empresa.getTenantId(), empresa.getVersion()
         );
         

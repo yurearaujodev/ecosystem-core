@@ -71,4 +71,9 @@ public class EmpresaUsuarioRepository extends GenericDao<EmpresaUsuario, String>
         }
         return lista;
     }
+    
+    public void removerVinculo(Connection conn, String tenantId, Long empresaId, Long usuarioId) throws SQLException {
+        String sql = "DELETE FROM empresa_usuario WHERE tenant_id = ? AND empresa_id = ? AND usuario_id = ?";
+        executeUpdate(conn, sql, tenantId, empresaId, usuarioId);
+    }
 }

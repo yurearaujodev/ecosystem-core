@@ -15,6 +15,20 @@ public class Usuario {
     private LocalDateTime ultimoAcesso;
     private String status;
     private int version;
+    private String macAddressAutorizado;
+ // --- Campos de Auditoria ---
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
+    private Long createdBy;
+    private Long updatedBy;
+    private Long deletedBy;
+
+    // --- Campos de Consentimento (LGPD) ---
+    private boolean consentimentoDados;
+    private LocalDateTime termoAceitoEm;
+    private String versaoTermo;
+    private LocalDateTime anonimizadoEm;
 
     public Usuario() {}
 
@@ -43,4 +57,92 @@ public class Usuario {
     public void setStatus(String status) { this.status = status; }
     public int getVersion() { return version; }
     public void setVersion(int version) { this.version = version; }
+    public String getMacAddressAutorizado() {
+        return macAddressAutorizado;
+    }
+
+    public void setMacAddressAutorizado(String macAddressAutorizado) {
+        this.macAddressAutorizado = macAddressAutorizado;
+    }
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public LocalDateTime getDeletedAt() {
+		return deletedAt;
+	}
+
+	public void setDeletedAt(LocalDateTime deletedAt) {
+		this.deletedAt = deletedAt;
+	}
+
+	public Long getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(Long createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Long getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(Long updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	public Long getDeletedBy() {
+		return deletedBy;
+	}
+
+	public void setDeletedBy(Long deletedBy) {
+		this.deletedBy = deletedBy;
+	}
+
+	public boolean isConsentimentoDados() {
+		return consentimentoDados;
+	}
+
+	public void setConsentimentoDados(boolean consentimentoDados) {
+		this.consentimentoDados = consentimentoDados;
+	}
+
+	public LocalDateTime getTermoAceitoEm() {
+		return termoAceitoEm;
+	}
+
+	public void setTermoAceitoEm(LocalDateTime termoAceitoEm) {
+		this.termoAceitoEm = termoAceitoEm;
+	}
+
+	public String getVersaoTermo() {
+		return versaoTermo;
+	}
+
+	public void setVersaoTermo(String versaoTermo) {
+		this.versaoTermo = versaoTermo;
+	}
+
+	public LocalDateTime getAnonimizadoEm() {
+		return anonimizadoEm;
+	}
+
+	public void setAnonimizadoEm(LocalDateTime anonimizadoEm) {
+		this.anonimizadoEm = anonimizadoEm;
+	}
+    
 }

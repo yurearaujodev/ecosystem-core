@@ -27,7 +27,6 @@ public class UsuarioController {
     @FXML private TableColumn<Usuario, String> colEmail;
     @FXML private TableColumn<Usuario, Long> colPessoaId;
     @FXML private TableColumn<Usuario, String> colStatus;
-    @FXML private TableColumn<Usuario, Integer> colVersao;
     @FXML private TextField txtFiltroEmail;
     
     @FXML private TableView<EmpresaUsuarioDetalheDTO> tblEmpresasVinculadas;
@@ -37,7 +36,6 @@ public class UsuarioController {
     @FXML private TableColumn<EmpresaUsuarioDetalheDTO, String> colPerfilNome;
 
     private final ObservableList<EmpresaUsuarioDetalheDTO> detailData = FXCollections.observableArrayList();
-
     private final UsuarioService usuarioService = new UsuarioService();
     private final ObservableList<Usuario> masterData = FXCollections.observableArrayList();
 
@@ -58,34 +56,31 @@ public class UsuarioController {
         colPerfilNome.setCellValueFactory(new PropertyValueFactory<>("perfilNome"));
         tblEmpresasVinculadas.setItems(detailData);
 
-        // 🔥 O SEGREDO: Listener que detecta cliques/seleções na tabela de usuários
+        // Listener que detecta cliques/seleções na tabela de usuários
         tblUsuarios.getSelectionModel().selectedItemProperty().addListener((observable, oldSelection, newSelection) -> {
-        	System.out.println("Clique detectado! Usuário ID: " + (newSelection != null ? newSelection.getId() : "null"));
-        	if (newSelection != null) {
+            if (newSelection != null) {
                 carregarEmpresasDoUsuarioAssincrono(newSelection.getId());
             } else {
-                detailData.clear(); // Limpa se nenhum usuário estiver selecionado
+                detailData.clear(); 
             }
         });
 
         carregarDadosAssincrono();
     }
+
     private void carregarEmpresasDoUsuarioAssincrono(Long usuarioId) {
         String tenantId = SessionManager.getTenantAtual().getId();
 
-        // Desvia a busca do JOIN para a Thread Pool de banco de dados
         AppExecutors.getDatabaseExecutor().execute(() -> {
             try {
                 List<EmpresaUsuarioDetalheDTO> vinculos = usuarioService.listarVinculosEmpresa(usuarioId, tenantId);
                 
-                System.out.println("Query retornou " + (vinculos != null ? vinculos.size() : "null") + " registros.");
-                // Devolve a lista preenchida de forma segura para a thread JavaFX
                 Platform.runLater(() -> {
                     detailData.clear();
                     detailData.addAll(vinculos);
                 });
             } catch (Exception e) {
-            	e.printStackTrace(); // Isso vai imprimir o erro real no console da sua IDE
+             //   logger.error("Erro ao carregar vínculos da empresa", e);
                 Platform.runLater(() -> {
                     Alert a = new Alert(Alert.AlertType.ERROR, "Erro: " + e.getMessage());
                     a.show();
@@ -94,28 +89,13 @@ public class UsuarioController {
         });
     }
     
-//    @FXML
-//    public void initialize() {
-//        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-//        colUuid.setCellValueFactory(new PropertyValueFactory<>("uuidPublico"));
-//        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-//        colPessoaId.setCellValueFactory(new PropertyValueFactory<>("pessoaId"));
-//        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-//        colVersao.setCellValueFactory(new PropertyValueFactory<>("version"));
-//
-//        tblUsuarios.setItems(masterData);
-//        carregarDadosAssincrono();
-//    }
-//
     private void carregarDadosAssincrono() {
         String tenantId = SessionManager.getTenantAtual().getId();
 
-        // Executa a query em background para não congelar o JavaFX
         AppExecutors.getDatabaseExecutor().execute(() -> {
             try {
                 List<Usuario> usuarios = usuarioService.listarTodos(tenantId);
                 
-                // Atualiza os componentes visuais de volta na UI Thread
                 Platform.runLater(() -> {
                     masterData.clear();
                     masterData.addAll(usuarios);
@@ -170,8 +150,35 @@ public class UsuarioController {
 
     @FXML
     void onNovoUsuario() {
+        abrirDialogCadastro(null, null);
+    }
+
+    /**
+     * 🔥 NOVO MÉTODO: Disparado ao clicar no botão "Alterar Operador"
+     */
+    @FXML
+    void onAlterarUsuario() {
+        Usuario usuarioSelecionado = tblUsuarios.getSelectionModel().getSelectedItem();
+        if (usuarioSelecionado == null) {
+            mostrarAlerta("Seleção Necessária", "Selecione um operador na tabela de cima para alterar.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        // Recupera o perfil vinculado a partir da tabela inferior (se houver algum vínculo ativo)
+        Long perfilIdAtual = null;
+        if (!tblEmpresasVinculadas.getItems().isEmpty()) {
+            perfilIdAtual = tblEmpresasVinculadas.getItems().get(0).getPerfilId();
+        }
+
+        // Abre o mesmo modal, mas passando o estado do usuário para edição!
+        abrirDialogCadastro(usuarioSelecionado, perfilIdAtual);
+    }
+
+    /**
+     * Centralizador de abertura da janela de cadastro/edição
+     */
+    private void abrirDialogCadastro(Usuario usuario, Long perfilIdAtual) {
         try {
-            // 🔥 CORREÇÃO: Adicionada a barra '/' no início para torná-lo um caminho absoluto a partir de resources
             var fxmlResource = getClass().getResource("/ui/modules/usuario-cadastro-dialog.fxml");
             
             if (fxmlResource == null) {
@@ -181,19 +188,24 @@ public class UsuarioController {
 
             FXMLLoader loader = new FXMLLoader(fxmlResource);
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Novo Operador Credenciado");
-            dialogStage.initModality(Modality.APPLICATION_MODAL); // Impede clicar na tela de trás enquanto esta estiver aberta
+            dialogStage.setTitle(usuario == null ? "Novo Operador Credenciado" : "Alterar Dados do Operador");
+            dialogStage.initModality(Modality.APPLICATION_MODAL); 
             dialogStage.setScene(new Scene(loader.load()));
 
             UsuarioCadastroDialogController controller = loader.getController();
             if (controller != null) {
                 controller.setStage(dialogStage);
+                
+                // Se o usuário foi passado, o modal entra automaticamente em modo de alteração!
+                if (usuario != null) {
+                    controller.setUsuarioParaEdicao(usuario, perfilIdAtual);
+                }
             }
             
             dialogStage.showAndWait();
-            carregarDadosAssincrono(); // Recarrega de forma assíncrona ao fechar a janela
+            carregarDadosAssincrono(); // Recarrega a tabela principal ao fechar a janela
         } catch (IOException e) {
-            e.printStackTrace(); // Ajuda a ver no console se houver outro erro dentro do FXML de cadastro
+            e.printStackTrace();
             mostrarAlerta("Erro de UI", "Não foi possível carregar a janela de diálogo: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }

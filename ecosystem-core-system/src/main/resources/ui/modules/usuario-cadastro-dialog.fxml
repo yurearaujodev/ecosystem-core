@@ -1,49 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="420.0" spacing="15.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.yat.ecosystemcore.ui.modules.usuario.UsuarioCadastroDialogController">
+<VBox prefWidth="480.0" spacing="12.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.yat.ecosystemcore.ui.modules.usuario.UsuarioCadastroDialogController">
    <children>
       <Label text="Formulário de Credenciamento" textFill="#2C3E50">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <VBox spacing="5.0">
+      
+      <VBox spacing="3.0">
          <children>
-            <Label text="ID da Pessoa Correlacionada *" textFill="#34495E" />
-            <TextField fx:id="txtPessoaId" promptText="Ex: 12" prefHeight="35.0" />
+            <Label text="Pessoa Associada *" textFill="#34495E" />
+            <HBox spacing="8.0">
+               <children>
+                  <TextField fx:id="txtPessoaNome" editable="false" prefHeight="35.0" promptText="Clique na lupa para selecionar a pessoa..." HBox.hgrow="ALWAYS" style="-fx-background-color: #F8F9FA; -fx-border-color: #CED4DA;" />
+                  <Button onAction="#onBuscarPessoa" prefHeight="35.0" prefWidth="45.0" text="🔍" style="-fx-cursor: hand;" />
+               </children>
+            </HBox>
          </children>
       </VBox>
-      <VBox spacing="5.0">
+
+      <VBox spacing="3.0">
          <children>
-            <Label text="ID da Empresa Vínculo (Opcional)" textFill="#34495E" />
-            <TextField fx:id="txtEmpresaId" promptText="Ex: 1" prefHeight="35.0" />
+            <Label text="Empresa Vínculo (Unidade/Filial) *" textFill="#34495E" />
+            <ComboBox fx:id="cmbEmpresa" prefHeight="35.0" prefWidth="Infinity" promptText="Selecione a Empresa..." />
          </children>
       </VBox>
-      <VBox spacing="5.0">
+
+      <VBox spacing="3.0">
          <children>
-            <Label text="E-mail Corporativo (Login) *" textFill="#34495E" />
-            <TextField fx:id="txtEmail" promptText="nome@empresa.com" prefHeight="35.0" />
+            <Label text="Perfil de Acesso (Nível de Permissão) *" textFill="#34495E" />
+            <ComboBox fx:id="cmbPerfil" prefHeight="35.0" prefWidth="Infinity" promptText="Selecione o perfil de segurança..." />
          </children>
       </VBox>
-      <VBox spacing="5.0">
+
+      <VBox spacing="3.0">
          <children>
-            <Label text="Senha de Acesso Inicial *" textFill="#34495E" />
-            <PasswordField fx:id="txtSenha" promptText="••••••••" prefHeight="35.0" />
+            <Label text="E-mail Corporativo *" textFill="#34495E" />
+            <TextField fx:id="txtEmail" prefHeight="35.0" promptText="nome@empresa.com" />
          </children>
       </VBox>
+
+      <VBox spacing="3.0">
+         <children>
+            <Label text="Senha de Acesso *" textFill="#34495E" />
+            <PasswordField fx:id="txtSenha" prefHeight="35.0" promptText="••••••••" />
+         </children>
+      </VBox>
+
+      <VBox spacing="3.0">
+         <children>
+            <Label text="MAC Address Autorizado (Opcional)" textFill="#34495E" />
+            <TextField fx:id="txtMacAddress" prefHeight="35.0" promptText="Ex: AA:BB:CC:DD:EE:FF" />
+         </children>
+      </VBox>
+
+      <CheckBox fx:id="chkConsentimento" text="Concedo o consentimento para tratamento de dados" wrapText="true" />
+      
       <HBox alignment="CENTER_RIGHT" spacing="10.0">
          <children>
             <Button onAction="#onCancelar" prefHeight="35.0" style="-fx-background-color: #95A5A6; -fx-text-fill: white;" text="Cancelar" />
-            <Button onAction="#onSalvar" prefHeight="35.0" style="-fx-background-color: #2ECC71; -fx-text-fill: white; -fx-font-weight: bold;" text="Confirmar e Salvar" />
+            <Button fx:id="btnSalvar" onAction="#onSalvar" prefHeight="35.0" style="-fx-background-color: #2ECC71; -fx-text-fill: white; -fx-font-weight: bold;" text="Confirmar e Salvar" />
          </children>
          <padding>
             <Insets top="10.0" />

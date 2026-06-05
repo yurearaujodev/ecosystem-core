@@ -19,6 +19,7 @@ import java.util.UUID;
 public class OnboardingTenantUseCase {
 
     private static final String TENANT_GLOBAL = "00000000-0000-0000-0000-000000000000";
+    public static final Long USUARIO_SISTEMA_ID = 0L;
 
     private final TenantRepository tenantRepository;
     private final EmpresaRepository empresaRepository;
@@ -42,6 +43,7 @@ public class OnboardingTenantUseCase {
     }
 
     public void executar(OnboardingTenantCommand command) throws Exception {
+        // 💡 Correção 1: Adicionado o "return null;" ao fim do bloco lambda para satisfazer o TransactionalSupplier<Void>
         TransactionManager.executeInTransaction(conn -> {
             
             // 1. Força o ID Global caso seja a instalação inicial
@@ -64,15 +66,17 @@ public class OnboardingTenantUseCase {
             // 5. Cadastros Core (Bloco 3) - Mapeia os dados customizados informados na interface
             Long empresaId = empresaRepository.insert(conn, mapearEmpresa(command, tenantId));
             Long pessoaId = pessoaRepository.insert(conn, mapearPessoa(command, tenantId));
-            Long usuarioId = usuarioRepository.insert(conn, mapearUsuario(command, tenantId, pessoaId, empresaId));
+            Long usuarioId = usuarioRepository.insert(conn, mapearUsuario(command, tenantId, pessoaId, empresaId),USUARIO_SISTEMA_ID);
 
             // 6. Tabela: usuario_seguranca_config (Bloco 6) - Mapeia as permissões de acesso finas
             salvarSegurancaConfig(conn, usuarioId, tenantId, command);
 
             // 7. Tabelas: perfil e empresa_usuario (Bloco 4 RBAC)
-            Long perfilId = perfilRepository.criarPerfilAdminSeNecessario(conn, tenantId);
+            Long perfilId = perfilRepository.criarPerfilAdminSeNecessario(conn, tenantId,USUARIO_SISTEMA_ID);
             concederPermissoesAoPerfil(conn, tenantId, perfilId);
             empresaUsuarioRepository.vincular(conn, tenantId, empresaId, usuarioId, perfilId);
+            
+            return null; 
         });
     }
 
@@ -158,7 +162,12 @@ public class OnboardingTenantUseCase {
         u.setPessoaId(pessoaId);
         u.setEmpresaPadraoId(empresaId);
         u.setEmail(cmd.emailAdmin().trim().toLowerCase());
-        u.setSenhaHash(passwordEncoder.encode(cmd.senhaAdmin()));
+        
+        // 💡 Correção 2: Convertemos a String do Command em char[] no exato momento do encode
+        // para se adequar à nova interface PasswordEncoder segura.
+        char[] senhaChars = cmd.senhaAdmin().toCharArray();
+        u.setSenhaHash(passwordEncoder.encode(senhaChars));
+        
         u.setStatus("ACTIVE");
         return u;
     }

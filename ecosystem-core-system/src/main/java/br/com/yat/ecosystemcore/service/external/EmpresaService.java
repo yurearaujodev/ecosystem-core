@@ -24,8 +24,8 @@ public class EmpresaService {
     }
 
     public void salvarEmpresa(Empresa empresa) {
-        String tenantId = SessionManager.getTenantAtual().getId();
-        empresa.setTenantId(tenantId);
+    	Long userId = SessionManager.getUsuarioLogado().getId();
+        empresa.setTenantId(SessionManager.getTenantAtual().getId());
         
         // Validações Básicas de Regra de Negócio
         if (empresa.getCnpj() == null || empresa.getCnpj().trim().length() != 14) {
@@ -37,16 +37,18 @@ public class EmpresaService {
 
         try (Connection conn = ConnectionFactory.getConnection()) {
             if (empresa.getId() == null) {
-                Long idGerado = repository.insert(conn, empresa);
-                empresa.setId(idGerado);
+                empresa.setCreatedBy(userId);
+                Long id = repository.insert(conn, empresa);
+                empresa.setId(id);
             } else {
-                boolean atualizado = repository.update(conn, empresa);
-                if (!atualizado) {
-                    throw new ConcurrentModificationException("Não foi possível atualizar a empresa. Verifique se os dados foram modificados por outro usuário.");
+                empresa.setUpdatedBy(userId);
+                if (!repository.update(conn, empresa)) {
+                    throw new ConcurrentModificationException("Erro de concorrência.");
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Falha operacional ao persistir os dados da empresa.", e);
+            if (e.getErrorCode() == 1062) throw new RuntimeException("CNPJ já cadastrado.");
+            throw new RuntimeException("Erro ao salvar.", e);
         }
     }
 

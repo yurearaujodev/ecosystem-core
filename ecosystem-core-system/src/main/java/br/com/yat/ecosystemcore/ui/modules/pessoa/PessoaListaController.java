@@ -2,7 +2,9 @@ package br.com.yat.ecosystemcore.ui.modules.pessoa;
 
 import br.com.yat.ecosystemcore.domain.entity.Pessoa;
 import br.com.yat.ecosystemcore.service.external.PessoaService;
+import br.com.yat.ecosystemcore.ui.core.ContextAware;
 import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,7 +16,7 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.util.List;
 
-public class PessoaListaController {
+public class PessoaListaController implements ContextAware{
 
     @FXML private TextField txtPesquisa;
     @FXML private TableView<Pessoa> tblPessoas;
@@ -32,6 +34,12 @@ public class PessoaListaController {
     public void initialize() {
         configurarColunas();
         carregarDados();
+    }
+    
+    @Override
+    public void onContextChanged() {
+        // Quando a empresa mudar, esta tela se auto-atualiza
+        Platform.runLater(this::carregarDados);
     }
 
     private void configurarColunas() {

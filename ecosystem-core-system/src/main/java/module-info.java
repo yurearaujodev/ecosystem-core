@@ -37,6 +37,7 @@ module br.com.yat.ecosystemcore {
     opens br.com.yat.ecosystemcore.ui.modules.home to javafx.fxml;
     opens br.com.yat.ecosystemcore.ui.modules.pessoa to javafx.fxml;
     opens br.com.yat.ecosystemcore.ui.modules.usuario to javafx.fxml;
+    opens br.com.yat.ecosystemcore.ui.modules.perfil to javafx.fxml;
 
     // =========================================================================
     // 🔑 CORREÇÃO DO ERRO: ABRE O DOMÍNIO PARA A TABLEVIEW DO JAVAFX RENDEREZAR

@@ -11,6 +11,7 @@ import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
 import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
 import br.com.yat.ecosystemcore.service.external.EmpresaService;
 import br.com.yat.ecosystemcore.service.external.UsuarioService;
+import br.com.yat.ecosystemcore.ui.core.ContextAware;
 import br.com.yat.ecosystemcore.ui.core.NavigationManager;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -90,6 +91,7 @@ public class MenuController implements Initializable {
                             .filter(v -> v.getEmpresaId().equals(SessionManager.getEmpresaFilial().getId()))
                             .findFirst().orElse(null)
                     );
+                    
                 });
             } catch (Exception e) {
                 e.printStackTrace();
@@ -105,18 +107,18 @@ public class MenuController implements Initializable {
             if (selecao != null) {
                 AppExecutors.getDatabaseExecutor().execute(() -> {
                     try {
-                        // Agora o compilador reconhece este método vindo do EmpresaService
                         Empresa empresaCompleta = empresaService.buscarPorId(selecao.getEmpresaId());
-                        
-                        // Atualiza o contexto global de segurança
                         SessionManager.setEmpresaFilial(empresaCompleta);
                         
                         Platform.runLater(() -> {
-                            System.out.println("Contexto de empresa alterado para: " + empresaCompleta.getNomeFantasia());
+                            // Notifica a tela ativa
+                            Object ctrl = navigationManager.getControllerAtual();
+                            if (ctrl instanceof ContextAware) {
+                                ((ContextAware) ctrl).onContextChanged();
+                            }
                         });
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        Platform.runLater(() -> mostrarAlertaErro("Erro ao trocar empresa", ex.getMessage()));
                     }
                 });
             }

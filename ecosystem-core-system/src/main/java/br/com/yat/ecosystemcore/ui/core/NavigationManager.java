@@ -55,9 +55,9 @@ public class NavigationManager implements Navigator {
         rotas.put(MenuChave.CADASTROS_USUARIOS, "/ui/modules/usuario-gerenciamento.fxml");
 
         // 🔐 Segurança
-        rotas.put(MenuChave.SEGURANCA_PERFIS, "/ui/modules/seguranca/PerfilConsultaView.fxml");
-        rotas.put(MenuChave.SEGURANCA_PERMISSOES, "/ui/modules/seguranca/PermissaoConsultaView.fxml");
-        rotas.put(MenuChave.SEGURANCA_ABA_USUARIO_DETALHE, "/ui/modules/seguranca/UsuarioGerenciamentoAbasView.fxml"); // (Usuário x Empresa, Permissões Extras)
+        rotas.put(MenuChave.SEGURANCA_PERFIS, "/ui/modules/perfil-consulta-view.fxml");
+        rotas.put(MenuChave.SEGURANCA_PERMISSOES, "/ui/modules/permissao-consulta-view.fxml");
+        rotas.put(MenuChave.SEGURANCA_ABA_USUARIO_DETALHE, "/ui/modules/usuario-gerenciamento-abas-view.fxml"); // (Usuário x Empresa, Permissões Extras)
         rotas.put(MenuChave.SEGURANCA_MFA, "/ui/modules/seguranca/MfaView.fxml");
         rotas.put(MenuChave.SEGURANCA_ABA_SESSÕES_TENTATIVAS, "/ui/modules/seguranca/MonitoramentoSessoesAbasView.fxml"); // (Sessões, Tentativas, Dispositivos)
 
@@ -164,5 +164,9 @@ public class NavigationManager implements Navigator {
         cacheTelas.clear();
         containerCentral.getChildren().clear();
         logger.debug("Cache de telas limpo completamente.");
+    }
+    
+    public Object getControllerAtual() {
+        return (telaAtual != null) ? telaAtual.getController() : null;
     }
 }
