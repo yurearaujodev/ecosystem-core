@@ -2,11 +2,10 @@ package br.com.yat.ecosystemcore.ui.modules.perfil;
 
 import br.com.yat.ecosystemcore.domain.entity.Perfil;
 import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
+import br.com.yat.ecosystemcore.infrastructure.security.Sessao; // 🔒 Importação corrigida para a infraestrutura ativa
 import br.com.yat.ecosystemcore.service.external.PerfilService;
 import br.com.yat.ecosystemcore.ui.core.ContextAware;
 import br.com.yat.ecosystemcore.ui.core.ScreenLifecycle;
-import br.com.yat.ecosystemcore.ui.modules.perfil.PerfilCadastroController;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -69,42 +68,52 @@ public class PerfilConsultaController implements Initializable, ScreenLifecycle,
             return row;
         });
 
-        // Filtro em tempo real digitado pelo usuário
+        // 🔍 Filtro em tempo real refinado, limpo e sem a "escada" de if/else
         txtPesquisa.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(perfil -> {
                 if (newValue == null || newValue.isBlank()) {
                     return true;
                 }
 
-                String lowerCaseFilter = newValue.toLowerCase().trim();
+                String query = newValue.toLowerCase().trim();
 
-                if (perfil.getNome() != null && perfil.getNome().toLowerCase().contains(lowerCaseFilter)) {
-                    return true;
-                } else if (perfil.getChaveIdentificadora() != null && perfil.getChaveIdentificadora().toLowerCase().contains(lowerCaseFilter)) {
-                    return true;
-                } else if (perfil.getDescricao() != null && perfil.getDescricao().toLowerCase().contains(lowerCaseFilter)) {
-                    return true;
-                }
-                
-                return false;
+                // Transforma as propriedades textuais em um fluxo de dados e verifica se alguma bate com a busca
+                return java.util.stream.Stream.of(
+                        perfil.getNome(), 
+                        perfil.getChaveIdentificadora(), 
+                        perfil.getDescricao()
+                )
+                .filter(java.util.Objects::nonNull) // Ignora campos nulos no banco com segurança
+                .map(String::toLowerCase)
+                .anyMatch(campo -> campo.contains(query)); // Retorna true se houver match em qualquer campo
             });
         });
     }
 
     @FXML
     public void carregarDados() {
-        String tenantId = SessionManager.getTenantAtual().getId();
+        // 🔒 VALIDAÇÃO DE SEGURANÇA: Bloqueia a execução assíncrona se não houver sessão ativa
+        if (!Sessao.isActive() || Sessao.tenant() == null) {
+            System.err.println("⚠️ TENTATIVA DE CONSULTA NEGADA: Nenhuma sessão ativa para o Tenant.");
+            masterData.clear();
+            return;
+        }
 
-        // Faz o fetch assíncrono usando o Pool de banco do AppExecutors
+        String tenantId = Sessao.tenant().getId();
+
+        // Faz o fetch assíncrono usando o Pool de banco do AppExecutors (Sem travar o JavaFX)
         AppExecutors.getDatabaseExecutor().execute(() -> {
             try {
                 var lista = perfilService.listarPerfisPorTenant(tenantId);
+                
                 Platform.runLater(() -> {
                     masterData.setAll(lista); 
                     txtPesquisa.clear(); // Limpa a barra de buscas para reexibir a lista completa atualizada
                 });
             } catch (Exception e) {
-                mostrarAlerta("Erro", "Falha ao carregar perfis: " + e.getMessage(), Alert.AlertType.ERROR);
+                Platform.runLater(() -> 
+                    mostrarAlerta("Erro", "Falha ao carregar perfis: " + e.getMessage(), Alert.AlertType.ERROR)
+                );
             }
         });
     }

@@ -23,6 +23,12 @@ public enum MenuChave {
     ADMIN_MENUS,   // Consulta + Novo
     ADMIN_TENANT_MENUS,
 
+    // 🔑 LICENCIAMENTO (Alinhado estritamente com o modelo de 5 tabelas)
+    LICENCAS_APLICATIVOS,         // Gerencia `licenca_aplicativo` (Catálogo de softwares/módulos comercializados)
+    LICENCAS_GERENCIAMENTO,       // Gerencia `licenca` e `licenca_payload` (Central de emissão e geração de tokens RSA)
+    LICENCAS_DISPOSITIVOS,        // Gerencia `ativacao_dispositivo` (Controle físico e liberação de hardwares/máquinas)
+    LICENCAS_REVOGACOES,          // Gerencia `revogacao_licenca` (Histórico e logs de chaves bloqueadas ou canceladas)
+    
     // 🔔 COMUNICAÇÃO
     COMUNICACAO_NOTIFICACOES,
 
@@ -38,7 +44,7 @@ public enum MenuChave {
     SISTEMA_OUTBOX_EVENTS,
     SISTEMA_SCHEMA_VERSAO,
 
-    // MÓDULO AUXILIAR (Mantido do seu código anterior)
+    // MÓDULO AUXILIAR
     CONFIGURACAO_BANCO,
     FINANCEIRO_FLUXO;
 }

@@ -1,7 +1,7 @@
 package br.com.yat.ecosystemcore.ui.modules.empresa;
 
 import br.com.yat.ecosystemcore.domain.entity.Empresa;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
+import br.com.yat.ecosystemcore.infrastructure.security.Sessao; // 🔒 Atualizado para a nova fachada unificada
 import br.com.yat.ecosystemcore.service.external.EmpresaService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -65,7 +65,6 @@ public class EmpresaCadastroController {
     }
 
     private void sincronizarCamposParaEntidade() {
-        // Limpa formatação básica (ex: pontos e traços se o usuário digitou mascarado)
         String cnpjLimpo = txtCnpj.getText() != null ? txtCnpj.getText().replaceAll("\\D", "") : "";
         
         empresaAlvo.setCnpj(cnpjLimpo);
@@ -86,18 +85,18 @@ public class EmpresaCadastroController {
         try {
             sincronizarCamposParaEntidade();
             
-            // 🛡️ SEGURANÇA MULTI-TENANT CONECTADA AO SESSION_MANAGER
+            // 🛡️ SEGURANÇA MULTI-TENANT ALINHADA À NOVA INFRAESTRUTURA
             if (empresaAlvo.getId() == null) {
-                // Captura o Tenant da sessão global que foi iniciada no AutenticacaoUseCase
-                if (SessionManager.getTenantAtual() != null) {
-                    String tenantLogadoId = br.com.yat.ecosystemcore.infrastructure.security.SessionManager.getTenantAtual().getId();
+                if (Sessao.isActive() && Sessao.tenant() != null) {
+                    // Vincula a nova empresa estritamente ao Tenant ativo coletado na Thread
+                    String tenantLogadoId = Sessao.tenant().getId();
                     empresaAlvo.setTenantId(tenantLogadoId);
                 } else {
                     throw new IllegalStateException("Não existe uma sessão de Tenant ativa no ecossistema.");
                 }
             }
             
-            // O Service cuida do insert, update e do versionamento
+            // O Service cuida do insert, update e do versionamento histórico
             empresaService.salvarEmpresa(empresaAlvo);
             
             salvoComSucesso = true;

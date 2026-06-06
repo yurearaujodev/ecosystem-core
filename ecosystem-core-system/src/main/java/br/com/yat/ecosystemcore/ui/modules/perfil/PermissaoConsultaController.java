@@ -4,7 +4,7 @@ import br.com.yat.ecosystemcore.domain.entity.CheckablePermissaoItem;
 import br.com.yat.ecosystemcore.domain.entity.Perfil;
 import br.com.yat.ecosystemcore.domain.entity.Permissao;
 import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
+import br.com.yat.ecosystemcore.infrastructure.security.Sessao; 
 import br.com.yat.ecosystemcore.service.external.PerfilService;
 import br.com.yat.ecosystemcore.service.external.PermissaoService;
 import br.com.yat.ecosystemcore.ui.core.ContextAware;
@@ -46,13 +46,10 @@ public class PermissaoConsultaController implements Initializable, ScreenLifecyc
     private void configurarComponentes() {
         colPerfilNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
         colPerfilChave.setCellValueFactory(new PropertyValueFactory<>("chaveIdentificadora"));
-        
-        // Define que a árvore renderizará CheckBoxes nativos
         treePermissoes.setCellFactory(CheckBoxTreeCell.forTreeView());
     }
 
     private void configurarListeners() {
-        // Listener de seleção da tabela de Perfis
         tblPerfis.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 focarNoPerfil(newSelection);
@@ -64,7 +61,14 @@ public class PermissaoConsultaController implements Initializable, ScreenLifecyc
 
     @FXML
     public void carregarPerfis() {
-        String tenantId = SessionManager.getTenantAtual().getId();
+        if (!Sessao.isActive() || Sessao.tenant() == null) {
+            System.err.println("⚠️ TENTATIVA DE CONSULTA NEGADA: Nenhuma sessão ativa para listar perfis.");
+            limparPainelDireito();
+            tblPerfis.getItems().clear();
+            return;
+        }
+
+        String tenantId = Sessao.tenant().getId();
         limparPainelDireito();
 
         AppExecutors.getDatabaseExecutor().execute(() -> {
@@ -72,29 +76,36 @@ public class PermissaoConsultaController implements Initializable, ScreenLifecyc
                 var lista = perfilService.listarPerfisPorTenant(tenantId);
                 Platform.runLater(() -> tblPerfis.setItems(FXCollections.observableArrayList(lista)));
             } catch (Exception e) {
-                mostrarAlerta("Erro", "Não foi possível carregar os perfis: " + e.getMessage(), Alert.AlertType.ERROR);
+                Platform.runLater(() -> 
+                    mostrarAlerta("Erro", "Não foi possível carregar os perfis: " + e.getMessage(), Alert.AlertType.ERROR)
+                );
             }
         });
     }
 
     private void focarNoPerfil(Perfil perfil) {
+        if (!Sessao.isActive() || Sessao.tenant() == null) {
+            limparPainelDireito();
+            return;
+        }
+
         this.perfilSelecionadoAtual = perfil;
         lblPerfilSelecionado.setText("Perfil Ativo: " + perfil.getNome());
         btnSalvar.setDisable(false);
         treePermissoes.setDisable(false);
-        
-        String tenantId = SessionManager.getTenantAtual().getId();
 
         AppExecutors.getDatabaseExecutor().execute(() -> {
             try {
-                // 1. Busca todas as permissões globais/tenant e as permissões que este perfil específico possui
-                List<Permissao> todasPermissoes = permissaoService.listarPermissoesDisponiveis(tenantId);
+                // 🛠️ FIX: Removido o argumento 'tenantId'. O service agora busca direto da Sessão de forma segura.
+                List<Permissao> todasPermissoes = permissaoService.listarPermissoesDisponiveis();
                 List<Long> idsPermissoesDoPerfil = permissaoService.obterIdsPermissoesDoPerfil(perfil.getId());
 
                 Platform.runLater(() -> construirArvore(todasPermissoes, idsPermissoesDoPerfil));
 
             } catch (Exception e) {
-                Platform.runLater(() -> mostrarAlerta("Erro", "Erro ao recuperar permissões: " + e.getMessage(), Alert.AlertType.ERROR));
+                Platform.runLater(() -> 
+                    mostrarAlerta("Erro", "Erro ao recuperar permissões: " + e.getMessage(), Alert.AlertType.ERROR)
+                );
             }
         });
     }
@@ -105,16 +116,14 @@ public class PermissaoConsultaController implements Initializable, ScreenLifecyc
         CheckBoxTreeItem<CheckablePermissaoItem> rootNode = new CheckBoxTreeItem<>(new CheckablePermissaoItem("Módulos do Sistema"));
         rootNode.setExpanded(true);
 
-        // Agrupa permissões pelo campo "modulo"
         Map<String, List<Permissao>> agrupadasPorModulo = new LinkedHashMap<>();
         for (Permissao perm : todas) {
             agrupadasPorModulo.computeIfAbsent(perm.getModulo(), k -> new ArrayList<>()).add(perm);
         }
 
-        // Monta a estrutura de nós
         for (Map.Entry<String, List<Permissao>> entrada : agrupadasPorModulo.entrySet()) {
             CheckBoxTreeItem<CheckablePermissaoItem> moduloNode = new CheckBoxTreeItem<>(new CheckablePermissaoItem(entrada.getKey()));
-            moduloNode.setExpanded(true); // Deixa os módulos expandidos por padrão
+            moduloNode.setExpanded(true);
 
             for (Permissao perm : entrada.getValue()) {
                 CheckablePermissaoItem itemWrapper = new CheckablePermissaoItem(perm);
@@ -124,8 +133,6 @@ public class PermissaoConsultaController implements Initializable, ScreenLifecyc
                 }
 
                 CheckBoxTreeItem<CheckablePermissaoItem> folhaNode = new CheckBoxTreeItem<>(itemWrapper);
-                
-                // Vincula a propriedade de seleção bidirecional do CheckBoxTreeItem com o nosso DTO wrapper
                 folhaNode.selectedProperty().bindBidirectional(itemWrapper.selecionadoProperty());
                 
                 moduloNode.getChildren().add(folhaNode);
@@ -135,12 +142,18 @@ public class PermissaoConsultaController implements Initializable, ScreenLifecyc
         }
 
         treePermissoes.setRoot(rootNode);
-        treePermissoes.setShowRoot(false); // Esconde o nó mestre "Módulos do Sistema" para visualização limpa
+        treePermissoes.setShowRoot(false);
     }
 
     @FXML
     private void onSalvar() {
         if (perfilSelecionadoAtual == null) return;
+
+        if (!Sessao.isActive()) {
+            mostrarAlerta("Sessão Expirada", "Sua sessão expirou. Operação de salvamento cancelada.", Alert.AlertType.WARNING);
+            limparPainelDireito();
+            return;
+        }
 
         List<Long> idsParaSalvar = new ArrayList<>();
         for (CheckBoxTreeItem<CheckablePermissaoItem> itemNode : itensFolhaTree) {
@@ -154,9 +167,13 @@ public class PermissaoConsultaController implements Initializable, ScreenLifecyc
         AppExecutors.getDatabaseExecutor().execute(() -> {
             try {
                 permissaoService.salvarPermissoesDoPerfil(perfilId, idsParaSalvar);
-                Platform.runLater(() -> mostrarAlerta("Sucesso", "Permissões do perfil atualizadas com sucesso!", Alert.AlertType.INFORMATION));
+                Platform.runLater(() -> 
+                    mostrarAlerta("Sucesso", "Permissões do perfil updated com sucesso!", Alert.AlertType.INFORMATION)
+                );
             } catch (Exception e) {
-                Platform.runLater(() -> mostrarAlerta("Erro de Banco", "Falha ao gravar alterações: " + e.getMessage(), Alert.AlertType.ERROR));
+                Platform.runLater(() -> 
+                    mostrarAlerta("Erro de Banco", "Falha ao gravar alterações: " + e.getMessage(), Alert.AlertType.ERROR)
+                );
             }
         });
     }
@@ -171,14 +188,15 @@ public class PermissaoConsultaController implements Initializable, ScreenLifecyc
     }
 
     private void mostrarAlerta(String titulo, String msg, Alert.AlertType tipo) {
-        Alert a = new Alert(tipo);
-        a.setTitle(titulo);
-        a.setHeaderText(null);
-        a.setContentText(msg);
-        a.show();
+        Platform.runLater(() -> {
+            Alert a = new Alert(tipo);
+            a.setTitle(titulo);
+            a.setHeaderText(null);
+            a.setContentText(msg);
+            a.show();
+        });
     }
 
-    // Interceptadores de ciclo de vida do NavigationManager
     @Override public void onContextChanged() { carregarPerfis(); }
     @Override public void onShow() { carregarPerfis(); }
     @Override public void onHide() {}

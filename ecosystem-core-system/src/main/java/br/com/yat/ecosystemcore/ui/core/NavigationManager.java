@@ -58,8 +58,8 @@ public class NavigationManager implements Navigator {
         rotas.put(MenuChave.SEGURANCA_PERFIS, "/ui/modules/perfil-consulta-view.fxml");
         rotas.put(MenuChave.SEGURANCA_PERMISSOES, "/ui/modules/permissao-consulta-view.fxml");
         rotas.put(MenuChave.SEGURANCA_ABA_USUARIO_DETALHE, "/ui/modules/usuario-gerenciamento-abas-view.fxml"); // (Usuário x Empresa, Permissões Extras)
-        rotas.put(MenuChave.SEGURANCA_MFA, "/ui/modules/seguranca/MfaView.fxml");
-        rotas.put(MenuChave.SEGURANCA_ABA_SESSÕES_TENTATIVAS, "/ui/modules/seguranca/MonitoramentoSessoesAbasView.fxml"); // (Sessões, Tentativas, Dispositivos)
+        rotas.put(MenuChave.SEGURANCA_MFA, "/ui/modules/mfa-config-view.fxml");
+        rotas.put(MenuChave.SEGURANCA_ABA_SESSÕES_TENTATIVAS, "/ui/modules/monitoramento-sessoes-abas-view.fxml"); // (Sessões, Tentativas, Dispositivos)
 
         // 🏢 Administração
         rotas.put(MenuChave.ADMIN_TENANTS, "/ui/modules/administracao/TenantConsultaView.fxml");
@@ -67,6 +67,12 @@ public class NavigationManager implements Navigator {
         rotas.put(MenuChave.ADMIN_MODULOS, "/ui/modules/administracao/ModuloConsultaView.fxml");
         rotas.put(MenuChave.ADMIN_MENUS, "/ui/modules/administracao/MenuConsultaView.fxml");
         rotas.put(MenuChave.ADMIN_TENANT_MENUS, "/ui/modules/administracao/TenantMenusView.fxml");
+        
+        // 🔑 Licenciamento (Refatorado focado exclusivamente no seu modelo de 5 tabelas)
+        rotas.put(MenuChave.LICENCAS_APLICATIVOS, "/ui/modules/licenciamento/LicencaAplicativoConsultaView.fxml");
+        rotas.put(MenuChave.LICENCAS_GERENCIAMENTO, "/ui/modules/licenciamento/LicencaGerenciamentoAbasView.fxml"); // Agrupa os dados de 'licenca' com o JSON de 'licenca_payload'
+        rotas.put(MenuChave.LICENCAS_DISPOSITIVOS, "/ui/modules/licenciamento/LicencaDispositivosView.fxml");
+        rotas.put(MenuChave.LICENCAS_REVOGACOES, "/ui/modules/licenciamento/LicencaRevogacaoHistoricoView.fxml");
 
         // 🔔 Comunicação
         rotas.put(MenuChave.COMUNICACAO_NOTIFICACOES, "/ui/modules/comunicacao/NotificacoesView.fxml");
@@ -78,10 +84,10 @@ public class NavigationManager implements Navigator {
         rotas.put(MenuChave.AUDITORIA_ABA_PRINCIPAL, "/ui/modules/auditoria/AuditoriaAbasView.fxml"); // (Logs e Configuração Auditoria)
 
         // ⚙ Sistema (Somente Consulta)
-        rotas.put(MenuChave.SISTEMA_CONFIGURACOES, "/ui/modules/sistema/ConfiguracoesGeraisView.fxml");
-        rotas.put(MenuChave.SISTEMA_JOBS, "/ui/modules/sistema/JobsConsultaView.fxml");
-        rotas.put(MenuChave.SISTEMA_OUTBOX_EVENTS, "/ui/modules/sistema/OutboxConsultaView.fxml");
-        rotas.put(MenuChave.SISTEMA_SCHEMA_VERSAO, "/ui/modules/sistema/SchemaVersaoView.fxml");
+        rotas.put(MenuChave.SISTEMA_CONFIGURACOES, "/ui/modules/sistema-configuracoes-view.fxml");
+        rotas.put(MenuChave.SISTEMA_JOBS, "/ui/modules/sistema-jobs-view.fxml");
+        rotas.put(MenuChave.SISTEMA_OUTBOX_EVENTS, "/ui/modules/sistema-outbox-events-view.fxml");
+        rotas.put(MenuChave.SISTEMA_SCHEMA_VERSAO, "/ui/modules/sistema-schema-versao-view.fxml");
 
         // Rotas Legadas / Auxiliares
         rotas.put(MenuChave.CONFIGURACAO_BANCO, "/ui/modules/configuracao-banco.fxml");

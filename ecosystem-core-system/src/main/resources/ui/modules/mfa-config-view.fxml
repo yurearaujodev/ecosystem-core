@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="15.0" alignment="CENTER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="br.com.yat.ecosystemcore.ui.modules.usuario.MfaConfigController" style="-fx-background-color: #ffffff;">
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
+
+    <Label text="Autenticação de Dois Fatores (MFA)" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+    <Label text="Aumente a segurança da sua conta exigindo um código do Google Authenticator ao logar." 
+           style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;" wrapText="true" textAlignment="CENTER"/>
+
+    <Separator/>
+
+    <VBox fx:id="paneDesativado" spacing="15.0" alignment="CENTER" managed="true" visible="true">
+        <Button fx:id="btnIniciar" text="Ativar Autenticação de Dois Fatores" onAction="#handleIniciarMfa"
+                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20;"/>
+    </VBox>
+
+    <VBox fx:id="paneConfigurando" spacing="15.0" alignment="CENTER" managed="false" visible="false">
+        <Label text="1. Escaneie o QR Code abaixo com o aplicativo do seu celular:" style="-fx-font-weight: bold;"/>
+        
+        <StackPane style="-fx-border-color: #bdc3c7; -fx-border-width: 1; -fx-padding: 10;">
+            <ImageView fx:id="imgQrCode" fitWidth="200.0" fitHeight="200.0" pickOnBounds="true" preserveRatio="true"/>
+        </StackPane>
+
+        <HBox alignment="CENTER" spacing="5">
+            <Label text="Chave Secreta se não conseguir escanear: " style="-fx-font-size: 11px;"/>
+            <TextField fx:id="txtSecretCopy" editable="false" style="-fx-font-size: 11px; -fx-background-color: #f8f9fa; -fx-border-color: #dee2e6;"/>
+        </HBox>
+
+        <Label text="2. Digite o código de 6 dígitos gerado pelo aplicativo:" style="-fx-font-weight: bold;"/>
+        <HBox alignment="CENTER" spacing="10.0">
+            <TextField fx:id="txtToken" promptText="000000" prefWidth="120.0" alignment="CENTER" style="-fx-font-size: 16px;"/>
+            <Button fx:id="btnConfirmar" text="Confirmar e Ativar" onAction="#handleConfirmarMfa"
+                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;"/>
+        </HBox>
+        <Button text="Cancelar" onAction="#handleCancelar" style="-fx-background-color: transparent; -fx-text-fill: #e74c3c;"/>
+    </VBox>
+
+    <VBox fx:id="paneAtivado" spacing="15.0" alignment="CENTER" managed="false" visible="false">
+        <Label text="✔ Seu MFA está Ativo e Configurado!" style="-fx-text-fill: #2ecc71; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+        <Label text="Sua conta está protegida por uma camada adicional de segurança." style="-fx-font-size: 12px;"/>
+        <Button text="Desativar Autenticação de Dois Fatores" onAction="#handleDesativarMfa"
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 8 16 8 16;"/>
+    </VBox>
+    
+    <ProgressIndicator fx:id="loadingIndicator" visible="false" managed="false" prefWidth="30" prefHeight="30"/>
+</VBox>

@@ -1,26 +1,34 @@
 package br.com.yat.ecosystemcore.ui.modules.home;
 
 import br.com.yat.ecosystemcore.ui.core.ScreenLifecycle;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
+import br.com.yat.ecosystemcore.infrastructure.security.SessionScope;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
 public class HomeController implements ScreenLifecycle {
 
-    @FXML private Label lblMensagemHome; // Garanta que tem esse ID no seu HomeView.fxml se quiser testar o texto
+    @FXML private Label lblMensagemHome;
 
     @Override
     public void onShow() {
         System.out.println("====== VERIFICAÇÃO DE SESSÃO ESTÁVEL ======");
-        if (SessionManager.getUsuarioLogado() != null) {
-            System.out.println("Usuário Conectado: " + SessionManager.getUsuarioLogado().getEmail());
-            System.out.println("Tenant ID Ativo: " + SessionManager.getTenantAtual().getId());
+        
+        // 🔒 Verificação baseada no novo escopo central de segurança
+        if (SessionScope.isActive() && SessionScope.usuario() != null) {
+            System.out.println("Usuário Conectado: " + SessionScope.usuario().getEmail());
+            System.out.println("Tenant ID Ativo: " + SessionScope.tenant().getId());
+            
+            if (SessionScope.empresa() != null) {
+                System.out.println("Empresa Ativa ID: " + SessionScope.empresa().getId());
+            } else {
+                System.out.println("Empresa Ativa ID: [Nenhuma Empresa Padrão Selecionada]");
+            }
             
             if (lblMensagemHome != null) {
-                lblMensagemHome.setText("Sessão ativa para: " + SessionManager.getUsuarioLogado().getEmail());
+                lblMensagemHome.setText("Sessão ativa para: " + SessionScope.usuario().getEmail());
             }
         } else {
-            System.err.println("⚠️ Alerta: Sessão perdida ou nula!");
+            System.err.println("⚠️ Alerta Crítico: Sessão perdida, nula ou inválida no SessionScope!");
         }
         System.out.println("===========================================");
     }

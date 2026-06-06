@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="br.com.yat.ecosystemcore.ui.modules.system.SistemaOutboxEventsController"
+      spacing="10" prefWidth="850" prefHeight="550" style="-fx-background-color: #f4f6f9;">
+    <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <VBox>
+            <Label text="📨 Eventos Outbox (Mensageria)" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Label text="Fila transacional de eventos assíncronos da tabela 'outbox_event'" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="🔄 Recarregar Fila" onAction="#carregarDados" style="-fx-cursor: hand;"/>
+    </HBox>
+    <Separator/>
+    <TableView fx:id="tblOutbox" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="colTenant" text="Tenant ID" prefWidth="180"/>
+            <TableColumn fx:id="colTipo" text="Tipo de Evento" prefWidth="200"/>
+            <TableColumn fx:id="colPayload" text="Payload JSON" prefWidth="250"/>
+            <TableColumn fx:id="colStatus" text="Processado" prefWidth="90"/>
+            <TableColumn fx:id="colCriado" text="Criado Em" prefWidth="140"/>
+        </columns>
+    </TableView>
+</VBox>

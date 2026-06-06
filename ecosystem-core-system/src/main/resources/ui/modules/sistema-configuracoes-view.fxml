@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="br.com.yat.ecosystemcore.ui.modules.system.SistemaConfiguracoesController"
+      spacing="10" prefWidth="850" prefHeight="550" style="-fx-background-color: #f4f6f9;">
+    <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <VBox>
+            <Label text="⚙ Parâmetros do Sistema" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Label text="Configurações Globais ativas na tabela 'sistema_config'" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="🔄 Atualizar" onAction="#carregarDados" style="-fx-cursor: hand;"/>
+    </HBox>
+    <Separator/>
+    <TableView fx:id="tblConfig" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colChave" text="Chave Parâmetro" prefWidth="220"/>
+            <TableColumn fx:id="colValor" text="Valor do Parâmetro (JSON)" prefWidth="380"/>
+            <TableColumn fx:id="colDesc" text="Descrição de Escopo" prefWidth="220"/>
+        </columns>
+    </TableView>
+</VBox>

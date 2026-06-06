@@ -2,15 +2,21 @@ package br.com.yat.ecosystemcore.ui.modules.pessoa;
 
 import br.com.yat.ecosystemcore.domain.entity.Pessoa;
 import br.com.yat.ecosystemcore.service.external.PessoaService;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
+import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
+import br.com.yat.ecosystemcore.infrastructure.security.Sessao;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 
 public class PessoaCadastroController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PessoaCadastroController.class);
 
     @FXML private Label lblTitulo;
     @FXML private Label lblNomeRazao;
@@ -63,8 +69,11 @@ public class PessoaCadastroController {
 
     public void iniciarInclusao(Runnable onSaveCallback) {
         this.pessoaFoco = new Pessoa();
-        // 🛠️ MUDANÇA: Captura dinâmica do Tenant da conta que logou
-        this.pessoaFoco.setTenantId(SessionManager.getTenantAtual().getId());
+        
+        if (Sessao.isActive() && Sessao.tenant() != null) {
+            this.pessoaFoco.setTenantId(Sessao.tenant().getId());
+        }
+        
         this.pessoaFoco.setAtivo(true);
         this.onSaveCallback = onSaveCallback;
         lblTitulo.setText("Nova Pessoa");
@@ -72,29 +81,51 @@ public class PessoaCadastroController {
 
     @FXML
     private void onSalvar() {
-        try {
-            pessoaFoco.setTipo(cbTipo.getValue());
-            pessoaFoco.setNomeRazao(txtNomeRazao.getText());
-            pessoaFoco.setApelidoFantasia(txtApelidoFantasia.getText());
-            pessoaFoco.setCpfCnpj(txtCpfCnpj.getText());
-            pessoaFoco.setTelefone(txtTelefone.getText());
+        // Desabilita temporariamente os campos para evitar cliques duplos (Double Submit)
+        setComponentesDisabilitados(true);
 
-            // 🛠️ MUDANÇA: Passando o ID do usuário real logado mapeado pelo SessionManager
-            Long usuarioLogadoId = SessionManager.getUsuarioLogado().getId();
-            pessoaService.salvarPessoa(pessoaFoco, usuarioLogadoId);
-            
-            exibirAlerta("Sucesso", "Pessoa salva com êxito no ecossistema!", Alert.AlertType.INFORMATION);
-            
-            if (onSaveCallback != null) {
-                onSaveCallback.run(); 
+        // Captura os dados da tela
+        pessoaFoco.setTipo(cbTipo.getValue());
+        pessoaFoco.setNomeRazao(txtNomeRazao.getText());
+        pessoaFoco.setApelidoFantasia(txtApelidoFantasia.getText());
+        pessoaFoco.setCpfCnpj(txtCpfCnpj.getText());
+        pessoaFoco.setTelefone(txtTelefone.getText());
+
+        // ⚡ OTIMIZADO: Despacha o processamento pesado para o Pool do Banco
+        AppExecutors.getDatabaseExecutor().submit(() -> {
+            try {
+                // A própria camada de serviço gerencia a transação interna e auditoria de Sessao
+                pessoaService.salvarPessoa(pessoaFoco); 
+                
+                // Retorna para a Thread da UI para atualizar a tela e fechar a janela
+                Platform.runLater(() -> {
+                    exibirAlerta("Sucesso", "Pessoa salva com êxito no ecossistema!", Alert.AlertType.INFORMATION);
+                    if (onSaveCallback != null) {
+                        onSaveCallback.run(); 
+                    }
+                    fecharJanela();
+                });
+
+            } catch (IllegalArgumentException e) {
+                logger.warn("Falha de validação ao salvar pessoa: {}", e.getMessage());
+                Platform.runLater(() -> {
+                    exibirAlerta("Validação", e.getMessage(), Alert.AlertType.WARNING);
+                    setComponentesDisabilitados(false);
+                });
+            } catch (SQLException e) {
+                logger.error("Erro de persistência SQL ao salvar cadastro de pessoa", e);
+                Platform.runLater(() -> {
+                    exibirAlerta("Erro de Banco", "Erro ao processar instrução SQL: " + e.getMessage(), Alert.AlertType.ERROR);
+                    setComponentesDisabilitados(false);
+                });
+            } catch (Exception e) {
+                logger.error("Erro inesperado no salvamento assíncrono", e);
+                Platform.runLater(() -> {
+                    exibirAlerta("Erro Crítico", "Falha interna: " + e.getMessage(), Alert.AlertType.ERROR);
+                    setComponentesDisabilitados(false);
+                });
             }
-            fecharJanela();
-            
-        } catch (IllegalArgumentException e) {
-            exibirAlerta("Validação", e.getMessage(), Alert.AlertType.WARNING);
-        } catch (SQLException e) {
-            exibirAlerta("Erro de Banco", "Erro ao processar instrução SQL: " + e.getMessage(), Alert.AlertType.ERROR);
-        }
+        });
     }
 
     @FXML
@@ -103,8 +134,18 @@ public class PessoaCadastroController {
     }
 
     private void fecharJanela() {
-        Stage stage = (Stage) txtNomeRazao.getScene().getWindow();
-        stage.close();
+        if (txtNomeRazao.getScene() != null && txtNomeRazao.getScene().getWindow() != null) {
+            Stage stage = (Stage) txtNomeRazao.getScene().getWindow();
+            stage.close();
+        }
+    }
+
+    private void setComponentesDisabilitados(boolean desabilitar) {
+        txtNomeRazao.setDisable(desabilitar);
+        txtApelidoFantasia.setDisable(desabilitar);
+        txtCpfCnpj.setDisable(desabilitar);
+        txtTelefone.setDisable(desabilitar);
+        cbTipo.setDisable(desabilitar);
     }
 
     private void exibirAlerta(String titulo, String conteudo, Alert.AlertType tipo) {

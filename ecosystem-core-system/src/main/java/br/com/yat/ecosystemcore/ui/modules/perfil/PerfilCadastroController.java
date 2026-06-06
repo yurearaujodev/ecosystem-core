@@ -2,7 +2,7 @@ package br.com.yat.ecosystemcore.ui.modules.perfil;
 
 import br.com.yat.ecosystemcore.domain.entity.Perfil;
 import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
+import br.com.yat.ecosystemcore.infrastructure.security.Sessao; // 🔒 Corrigido para a classe real da sua infraestrutura
 import br.com.yat.ecosystemcore.service.external.PerfilService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -21,14 +21,22 @@ public class PerfilCadastroController {
     private Perfil perfilEdicao;
     private boolean salvoComSucesso = false;
 
+    @FXML
+    public void initialize() {
+        // Por padrão, esconde o botão de exclusão. Ele só aparece se for uma edição ativa.
+        btnExcluir.setVisible(false);
+    }
+
     public void setPerfilParaEdicao(Perfil perfil) {
+        if (perfil == null) return;
+        
         this.perfilEdicao = perfil;
         lblTitulo.setText("Editar Perfil #" + perfil.getId());
         txtNome.setText(perfil.getNome());
         txtChave.setText(perfil.getChaveIdentificadora());
-        txtChave.setDisable(true); 
+        txtChave.setDisable(true); // Evita alteração da constraint de negócio do sistema
         txtDescricao.setText(perfil.getDescricao());
-        btnExcluir.setVisible(true); // Ativa o botão de exclusão apenas se for edição
+        btnExcluir.setVisible(true); 
     }
 
     public boolean isSalvoComSucesso() {
@@ -46,8 +54,14 @@ public class PerfilCadastroController {
             return;
         }
 
-        Long usuarioLogadoId = SessionManager.getUsuarioLogado().getId();
-        String tenantId = SessionManager.getTenantAtual().getId();
+        // 🔒 PROTEÇÃO: Valida se a sessão não caiu antes de submeter alterações ao banco
+        if (!Sessao.isActive() || Sessao.usuario() == null || Sessao.tenant() == null) {
+            mostrarAlerta("Sessão Expirada", "Sua sessão expirou. Autentique-se novamente.", Alert.AlertType.ERROR);
+            return;
+        }
+
+        Long usuarioLogadoId = Sessao.usuario().getId();
+        String tenantId = Sessao.tenant().getId();
 
         boolean ehEdicao = (perfilEdicao != null);
         Perfil perfil = ehEdicao ? perfilEdicao : new Perfil();
@@ -69,7 +83,9 @@ public class PerfilCadastroController {
                     fecharJanela();
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> mostrarAlerta("Erro", "Erro ao salvar perfil: " + e.getMessage(), Alert.AlertType.ERROR));
+                Platform.runLater(() -> 
+                    mostrarAlerta("Erro", "Erro ao salvar perfil: " + e.getMessage(), Alert.AlertType.ERROR)
+                );
             }
         });
     }
@@ -82,19 +98,28 @@ public class PerfilCadastroController {
         alert.setHeaderText(null);
         alert.showAndWait().ifPresent(resposta -> {
             if (resposta == ButtonType.YES) {
+                
+                // 🔒 PROTEÇÃO: Evita quebras caso a sessão seja limpa concorrentemente
+                if (!Sessao.isActive()) {
+                    mostrarAlerta("Erro de Sessão", "Operação cancelada: Usuário não autenticado.", Alert.AlertType.ERROR);
+                    return;
+                }
+
                 Long id = perfilEdicao.getId();
-                String tenantId = SessionManager.getTenantAtual().getId();
-                Long usuarioLogadoId = SessionManager.getUsuarioLogado().getId();
+                String tenantId = Sessao.tenant().getId();
+                Long usuarioLogadoId = Sessao.usuario().getId();
 
                 AppExecutors.getDatabaseExecutor().execute(() -> {
                     try {
                         perfilService.excluirPerfil(id, tenantId, usuarioLogadoId);
                         Platform.runLater(() -> {
-                            salvoComSucesso = true; // Força refresh da tabela de trás
+                            salvoComSucesso = true; 
                             fecharJanela();
                         });
                     } catch (Exception e) {
-                        Platform.runLater(() -> mostrarAlerta("Erro", "Falha ao deletar: " + e.getMessage(), Alert.AlertType.ERROR));
+                        Platform.runLater(() -> 
+                            mostrarAlerta("Erro", "Falha ao deletar: " + e.getMessage(), Alert.AlertType.ERROR)
+                        );
                     }
                 });
             }
@@ -108,7 +133,9 @@ public class PerfilCadastroController {
 
     private void fecharJanela() {
         Stage stage = (Stage) txtNome.getScene().getWindow();
-        stage.close();
+        if (stage != null) {
+            stage.close();
+        }
     }
 
     private void mostrarAlerta(String titulo, String msg, Alert.AlertType tipo) {

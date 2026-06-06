@@ -55,6 +55,7 @@ public class UsuarioGerenciamentoAbasController implements ScreenLifecycle {
     @FXML
     public void initialize() {
         configurarTabelas();
+        configurarListViewPermissoes();
         
         // Listener reativo: Carrega os dados das tabelas assim que um usuário é selecionado
         comboUsuarios.getSelectionModel().selectedItemProperty().addListener((obs, antigo, novo) -> {
@@ -89,33 +90,81 @@ public class UsuarioGerenciamentoAbasController implements ScreenLifecycle {
         });
     }
 
+    private void configurarListViewPermissoes() {
+        // 🛠️ FIX: Configura a CellFactory para renderizar o CheckBox real na UI do JavaFX
+        listViewPermissoesExtras.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(CheckBoxListCellData item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                    setText(null);
+                } else {
+                    setGraphic(item.getCheckBox());
+                }
+            }
+        });
+    }
+
+//    @Override
+//    public void onShow() {
+//        setCarregando(true);
+//        AppExecutors.getDatabaseExecutor().submit(() -> {
+//            try {
+//                List<CustomItem> usuarios = List.of(new CustomItem(1L, "João Administrador (Master)"), new CustomItem(2L, "Marta Operadora"));
+//                List<CustomItem> empresas = List.of(new CustomItem(10L, "Matriz Holding S/A"), new CustomItem(11L, "Filial São Paulo"));
+//                List<CustomItem> perfis = List.of(new CustomItem(100L, "ADMINISTRADOR"), new CustomItem(101L, "OPERADOR"));
+//                
+//                List<CheckBoxListCellData> permissoesDoSistema = List.of(
+//                    new CheckBoxListCellData(500L, "empresa:deletar", "Permissão destrutiva de empresas"),
+//                    new CheckBoxListCellData(501L, "financeiro:fluxo", "Acesso ao fluxo de caixa")
+//                );
+//
+//                Platform.runLater(() -> {
+//                    comboUsuarios.setItems(FXCollections.observableArrayList(usuarios));
+//                    comboEmpresas.setItems(FXCollections.observableArrayList(empresas));
+//                    comboPerfis.setItems(FXCollections.observableArrayList(perfis));
+//                    listViewPermissoesExtras.setItems(FXCollections.observableArrayList(permissoesDoSistema));
+//                    setCarregando(false);
+//                });
+//            } catch (Exception e) {
+//                logger.error("Erro ao carregar dados estruturais de segurança", e);
+//                Platform.runLater(() -> setCarregando(false));
+//            }
+//        });
+//    }
+    
+    
     @Override
     public void onShow() {
-        // Quando a tela é exibida pelo NavigationManager, alimenta os filtros iniciais em segundo plano
         setCarregando(true);
         AppExecutors.getDatabaseExecutor().submit(() -> {
             try {
-                // Aqui simularíamos consultas globais para listar usuários, empresas e permissões para popular os combos
-                // Para manter focado na regra, mockamos listas ilustrativas que seriam trazidas de seus Daos genéricos
-                List<CustomItem> usuarios = List.of(new CustomItem(1L, "João Administrador (Master)"), new CustomItem(2L, "Marta Operadora"));
-                List<CustomItem> empresas = List.of(new CustomItem(10L, "Matriz Holding S/A"), new CustomItem(11L, "Filial São Paulo"));
-                List<CustomItem> perfis = List.of(new CustomItem(100L, "ADMINISTRADOR"), new CustomItem(101L, "OPERADOR"));
-                
-                List<CheckBoxListCellData> permissoesDoSistema = List.of(
-                    new CheckBoxListCellData(500L, "empresa:deletar", "Permissão destrutiva de empresas"),
-                    new CheckBoxListCellData(501L, "financeiro:fluxo", "Acesso ao fluxo de caixa")
-                );
+                // Buscando dados reais do banco
+                List<CustomItem> usuarios = service.buscarTodosUsuariosAtivos();
+                logger.info("Total de usuários encontrados no banco: {}", (usuarios != null ? usuarios.size() : "NULL"));
+                List<CustomItem> empresas = service.buscarEmpresasDoTenant();
+                List<CustomItem> perfis = service.buscarPerfisDisponiveis();
+                List<CheckBoxListCellData> permissoes = service.buscarTodasPermissoes();
 
                 Platform.runLater(() -> {
+                	if (usuarios != null && !usuarios.isEmpty()) {
+                        comboUsuarios.setItems(FXCollections.observableArrayList(usuarios));
+                    } else {
+                        logger.warn("A lista de usuários está vazia para este Tenant.");
+                    }
                     comboUsuarios.setItems(FXCollections.observableArrayList(usuarios));
                     comboEmpresas.setItems(FXCollections.observableArrayList(empresas));
                     comboPerfis.setItems(FXCollections.observableArrayList(perfis));
-                    listViewPermissoesExtras.setItems(FXCollections.observableArrayList(permissoesDoSistema));
+                    listViewPermissoesExtras.setItems(FXCollections.observableArrayList(permissoes));
                     setCarregando(false);
                 });
             } catch (Exception e) {
-                logger.error("Erro ao carregar dados estruturais de segurança", e);
-                Platform.runLater(() -> setCarregando(false));
+                logger.error("Erro ao carregar dados dinâmicos do banco", e);
+                Platform.runLater(() -> {
+                    setCarregando(false);
+                    mostrarAlerta("Erro de Carregamento", "Falha ao buscar dados: " + e.getMessage());
+                });
             }
         });
     }
@@ -126,22 +175,17 @@ public class UsuarioGerenciamentoAbasController implements ScreenLifecycle {
 
         AppExecutors.getDatabaseExecutor().submit(() -> {
             try {
-                // 1. Busca os vínculos Empresa x Perfil
                 List<EmpresaUsuarioDetalheDTO> vinculos = service.listarVinculosDoUsuario(usuarioId);
-                // 2. Busca IDs das permissões extras
                 List<Long> idsExtras = service.listarIdsPermissoesExtrasDoUsuario(usuarioId);
-                // 3. Busca flags de segurança
                 UsuarioSegurancaConfigDTO segConfig = service.buscarConfiguracoesDeSeguranca(usuarioId);
 
                 Platform.runLater(() -> {
                     vinculosTabela.setAll(vinculos);
                     
-                    // Atualiza a lista visual de CheckBoxes de permissões extras
                     for (CheckBoxListCellData cell : listViewPermissoesExtras.getItems()) {
                         cell.setSelected(idsExtras.contains(cell.id()));
                     }
 
-                    // Atualiza as flags na tela
                     chkRequerNovaSenha.setSelected(segConfig.requerNovaSenha());
                     chkAceitaForaEmpresa.setSelected(segConfig.aceitaAcessoForaEmpresa());
                     chkMultiplasSessoes.setSelected(segConfig.permitirMultiplasSessoes());
@@ -167,7 +211,6 @@ public class UsuarioGerenciamentoAbasController implements ScreenLifecycle {
             return;
         }
 
-        // Evita inserção de duplicados na tabela reativa local
         boolean jaExiste = vinculosTabela.stream().anyMatch(v -> v.getEmpresaId().equals(emp.id()));
         if (jaExiste) {
             mostrarAlerta("Vínculo Existente", "Este usuário já possui um perfil mapeado nesta empresa.");
@@ -184,7 +227,6 @@ public class UsuarioGerenciamentoAbasController implements ScreenLifecycle {
 
         setCarregando(true);
 
-        // Coleta os IDs marcados na aba de permissões adicionais
         List<Long> extrasMarcados = new ArrayList<>();
         for (CheckBoxListCellData item : listViewPermissoesExtras.getItems()) {
             if (item.isSelected()) extrasMarcados.add(item.id());
@@ -204,12 +246,11 @@ public class UsuarioGerenciamentoAbasController implements ScreenLifecycle {
             dtoConfig
         );
 
-        // Despacha para segundo plano integrando com o seu TransactionManager reativo
         AppExecutors.getDatabaseExecutor().submit(() -> {
             try {
-                TransactionManager.executeInTransaction(conn -> {
+                // 🛠️ FIX: Alterado de executeInTransaction(Supplier) para executeVoidInTransaction(Runnable)
+                TransactionManager.executeVoidInTransaction(conn -> {
                     salvarUseCase.execute(command);
-                    return null;
                 });
 
                 Platform.runLater(() -> {
@@ -243,19 +284,24 @@ public class UsuarioGerenciamentoAbasController implements ScreenLifecycle {
         Alert a = new Alert(Alert.AlertType.INFORMATION); a.setTitle(tit); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
     }
 
-    // --- CLASSES AUXILIARES DE SUPORTE VISUAL (REATIVAS) ---
     public record CustomItem(Long id, String nome) { @Override public String toString() { return nome; } }
 
     public static class CheckBoxListCellData {
         private final Long id;
         private final CheckBox checkBox;
+        
         public CheckBoxListCellData(Long id, String chave, String desc) {
             this.id = id;
             this.checkBox = new CheckBox(chave + " (" + desc + ")");
         }
+        
         public Long id() { return id; }
         public boolean isSelected() { return checkBox.isSelected(); }
         public void setSelected(boolean val) { checkBox.setSelected(val); }
+        
+        // 🛠️ Auxiliar exposto para a CellFactory renderizar graficamente o CheckBox
+        public CheckBox getCheckBox() { return checkBox; }
+        
         @Override public String toString() { return checkBox.getText(); }
     }
 }

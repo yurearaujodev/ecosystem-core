@@ -3,20 +3,20 @@ package br.com.yat.ecosystemcore.ui.modules.pessoa;
 import br.com.yat.ecosystemcore.domain.entity.Pessoa;
 import br.com.yat.ecosystemcore.service.external.PessoaService;
 import br.com.yat.ecosystemcore.ui.core.ContextAware;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
+import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
+import br.com.yat.ecosystemcore.infrastructure.security.Sessao;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
 import java.util.List;
 
-public class PessoaListaController implements ContextAware{
+public class PessoaListaController implements ContextAware {
 
     @FXML private TextField txtPesquisa;
     @FXML private TableView<Pessoa> tblPessoas;
@@ -38,16 +38,17 @@ public class PessoaListaController implements ContextAware{
     
     @Override
     public void onContextChanged() {
-        // Quando a empresa mudar, esta tela se auto-atualiza
-        Platform.runLater(this::carregarDados);
+        // Quando o contexto organizacional mudar, esta tela se auto-atualiza de forma segura
+        carregarDados();
     }
 
     private void configurarColunas() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colTipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
-        colNome.setCellValueFactory(new PropertyValueFactory<>("nomeRazao"));
-        colCpfCnpj.setCellValueFactory(new PropertyValueFactory<>("cpfCnpj"));
-        colTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
+        // Usando expressões lambda explícitas para evitar reflexão pesada e erros em tempo de execução
+        colId.setCellValueFactory(cellData -> new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getId()));
+        colTipo.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTipo()));
+        colNome.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNomeRazao()));
+        colCpfCnpj.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCpfCnpj()));
+        colTelefone.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTelefone()));
         
         colStatus.setCellValueFactory(cellData -> {
             boolean ativo = cellData.getValue().isAtivo();
@@ -56,18 +57,36 @@ public class PessoaListaController implements ContextAware{
     }
 
     private void carregarDados() {
-        try {
-            masterData.clear();
-            // 🛠️ MUDANÇA: Buscando o id do Tenant diretamente da Sessão ativa
-            String tenantId = SessionManager.getTenantAtual().getId();
-            List<Pessoa> bdPessoas = pessoaService.listarTodas(tenantId);
-            masterData.addAll(bdPessoas);
-            tblPessoas.setItems(masterData);
-        } catch (SQLException e) {
-            exibirAlerta("Erro", "Falha ao carregar pessoas do banco: " + e.getMessage(), Alert.AlertType.ERROR);
-        } catch (NullPointerException e) {
-            exibirAlerta("Erro de Sessão", "Nenhum usuário autenticado no sistema.", Alert.AlertType.ERROR);
-        }
+        // Reduz o risco de travamento na interface despachando a consulta para as Threads de Banco
+        AppExecutors.getDatabaseExecutor().submit(() -> {
+            try {
+                // 🔒 VALIDAÇÃO: Verifica de antemão se a sessão corporativa está de fato ativa
+                if (!Sessao.isActive()) {
+                    Platform.runLater(() -> exibirAlerta("Erro de Sessão", "Nenhum usuário autenticado ou sessão expirada.", Alert.AlertType.ERROR));
+                    return;
+                }
+
+                // O método real não precisa de argumentos, ele se auto-blinda por Tenant internamente
+                List<Pessoa> bdPessoas = pessoaService.listarTodas();
+
+                // Devolve a atualização dos dados para a thread gráfica do JavaFX
+                Platform.runLater(() -> {
+                    masterData.clear();
+                    masterData.addAll(bdPessoas);
+                    tblPessoas.setItems(masterData);
+                    
+                    // Se houver algum texto residual no campo de busca, reaplica o filtro
+                    if (txtPesquisa.getText() != null && !txtPesquisa.getText().trim().isEmpty()) {
+                        onPesquisar();
+                    }
+                });
+
+            } catch (SQLException e) {
+                Platform.runLater(() -> exibirAlerta("Erro", "Falha ao carregar pessoas do banco: " + e.getMessage(), Alert.AlertType.ERROR));
+            } catch (Exception e) {
+                Platform.runLater(() -> exibirAlerta("Erro Crítico", "Falha interna inesperada: " + e.getMessage(), Alert.AlertType.ERROR));
+            }
+        });
     }
 
     @FXML
@@ -96,7 +115,7 @@ public class PessoaListaController implements ContextAware{
     private void onAlterar() {
         Pessoa selecionada = tblPessoas.getSelectionModel().getSelectedItem();
         if (selecionada == null) {
-            exibirAlerta("Aviso", "Selecione uma pessoa na tabela para poder alterar.", Alert.AlertType.WARNING);
+            boxAvisoSelecao();
             return;
         }
         abrirFormulario(selecionada);
@@ -130,25 +149,31 @@ public class PessoaListaController implements ContextAware{
     private void onExcluir() {
         Pessoa selecionada = tblPessoas.getSelectionModel().getSelectedItem();
         if (selecionada == null) {
-            exibirAlerta("Aviso", "Selecione uma pessoa na tabela para realizar a exclusão lógica.", Alert.AlertType.WARNING);
+            boxAvisoSelecao();
             return;
         }
 
         Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION, "Deseja mesmo arquivar a pessoa " + selecionada.getNomeRazao() + "?", ButtonType.YES, ButtonType.NO);
         confirmacao.showAndWait().ifPresent(resposta -> {
             if (resposta == ButtonType.YES) {
-                try {
-                    // 🛠️ MUDANÇA: Passando dados extraídos do SessionManager em tempo de execução
-                    String tenantId = SessionManager.getTenantAtual().getId();
-                    Long usuarioId = SessionManager.getUsuarioLogado().getId();
-                    
-                    pessoaService.deletarPessoa(selecionada.getId(), tenantId, usuarioId);
-                    carregarDados();
-                } catch (SQLException e) {
-                    exibirAlerta("Erro", "Erro ao executar exclusão: " + e.getMessage(), Alert.AlertType.ERROR);
-                }
+                // Executa a exclusão lógica em background para não congelar o sistema
+                AppExecutors.getDatabaseExecutor().submit(() -> {
+                    try {
+                        // 🛠️ CORRIGIDO: O método real do seu serviço exige apenas o ID da Pessoa
+                        pessoaService.deletarPessoa(selecionada.getId());
+                        
+                        // Atualiza a tabela chamando novamente o método assíncrono
+                        carregarDados();
+                    } catch (SQLException e) {
+                        Platform.runLater(() -> exibirAlerta("Erro", "Erro ao executar exclusão: " + e.getMessage(), Alert.AlertType.ERROR));
+                    }
+                });
             }
         });
+    }
+
+    private void boxAvisoSelecao() {
+        exibirAlerta("Aviso", "Selecione uma pessoa na tabela para realizar esta ação.", Alert.AlertType.WARNING);
     }
 
     private void exibirAlerta(String titulo, String conteudo, Alert.AlertType tipo) {

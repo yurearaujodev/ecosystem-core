@@ -3,7 +3,6 @@ package br.com.yat.ecosystemcore.application.usuario;
 import br.com.yat.ecosystemcore.application.usuario.dto.SessaoDTO;
 import br.com.yat.ecosystemcore.domain.entity.*;
 import br.com.yat.ecosystemcore.infrastructure.database.TransactionManager;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
 import br.com.yat.ecosystemcore.repository.empresa.EmpresaRepository;
 import br.com.yat.ecosystemcore.repository.tenant.TenantRepository;
 import br.com.yat.ecosystemcore.repository.usuario.SessaoUsuarioRepository;
@@ -31,7 +30,7 @@ public class AutenticacaoUseCase {
 
     public SessaoDTO autenticar(String email, char[] senhaDisponivel, String tenantId) throws SQLException {
         try {
-            SessaoDTO sessaoValida = TransactionManager.executeInTransaction(conn -> {
+            return TransactionManager.executeInTransaction(conn -> {
                 
                 // 🛡️ CORREÇÃO MULTI-TENANT: Busca restrita ao escopo do Tenant informado na UI
                 Usuario usuario = usuarioRepository.findByEmailETenant(conn, email, tenantId)
@@ -63,24 +62,35 @@ public class AutenticacaoUseCase {
                         .orElse(null); 
                 }
 
-                SessaoUsuario sessao = new SessaoUsuario();
-                String token64 =
-        UUID.randomUUID().toString().replace("-", "")
-      + UUID.randomUUID().toString().replace("-", "");
+                // 🚀 GERAÇÃO DE CHAVES E TOKENS DE SEGURANÇA
+                String sessionId = UUID.randomUUID().toString().replace("-", "") 
+                                 + UUID.randomUUID().toString().replace("-", "");
+                
+                String refreshToken = UUID.randomUUID().toString().replace("-", "");
+                
+                LocalDateTime expiraEm = LocalDateTime.now().plusHours(8);
+                LocalDateTime refreshExpiraEm = LocalDateTime.now().plusDays(7); // Refresh token válido por 7 dias
 
-                sessao.setId(token64);
+                // Instancia o registro físico da sessão para gravação em banco
+                SessaoUsuario sessao = new SessaoUsuario();
+                sessao.setId(sessionId);
                 sessao.setTenantId(usuario.getTenantId());
                 sessao.setUsuarioId(usuario.getId());
                 sessao.setEmpresaAtivaId(empresa != null ? empresa.getId() : null);
-                sessao.setExpiraEm(LocalDateTime.now().plusHours(8));
+                sessao.setTokenAtualizacao(refreshToken);
+                sessao.setRefreshExpiraEm(refreshExpiraEm);
+                sessao.setExpiraEm(expiraEm);
+                sessao.setIpOrigem("127.0.0.1"); // Pode mapear o IP real futuramente
+                sessao.setDispositivoInfo("Desktop JavaFX");
 
+                // Salva no banco usando as regras do seu repositório físico
                 sessaoUsuarioRepository.insert(conn, sessao);
 
-                return new SessaoDTO(usuario, tenant, empresa);
-            });
+                logger.info("Sessão [{}] aberta com sucesso para o usuário: {}", sessionId, usuario.getEmail());
 
-            SessionManager.iniciarSessao(sessaoValida.getUsuario(), sessaoValida.getTenant(), sessaoValida.getEmpresa());
-            return sessaoValida;
+                // 🌟 AGORA RETORNA COMPLETO: Instancia o SessaoDTO com os novos metadados obrigatórios!
+                return new SessaoDTO(usuario, tenant, empresa, sessionId, expiraEm, refreshToken);
+            });
 
         } finally {
             // Garante a destruição física imediata dos dados da stack ao sair do UseCase
@@ -88,73 +98,3 @@ public class AutenticacaoUseCase {
         }
     }
 }
-//package br.com.yat.ecosystemcore.application.usuario;
-//
-//import br.com.yat.ecosystemcore.application.usuario.dto.SessaoDTO;
-//import br.com.yat.ecosystemcore.domain.entity.*;
-//import br.com.yat.ecosystemcore.infrastructure.database.TransactionManager;
-//import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
-//import br.com.yat.ecosystemcore.repository.empresa.EmpresaRepository;
-//import br.com.yat.ecosystemcore.repository.tenant.TenantRepository;
-//import br.com.yat.ecosystemcore.repository.usuario.SessaoUsuarioRepository;
-//import br.com.yat.ecosystemcore.repository.usuario.UsuarioRepository;
-//
-//import java.sql.SQLException;
-//import java.time.LocalDateTime;
-//import java.util.UUID;
-//
-//public class AutenticacaoUseCase {
-//
-//    private final UsuarioRepository usuarioRepository = new UsuarioRepository();
-//    private final TenantRepository tenantRepository = new TenantRepository();
-//    private final EmpresaRepository empresaRepository = new EmpresaRepository();
-//    private final SessaoUsuarioRepository sessaoUsuarioRepository = new SessaoUsuarioRepository();
-//
-//    private final PasswordEncoder passwordEncoder;
-//
-//    public AutenticacaoUseCase(PasswordEncoder passwordEncoder) {
-//        this.passwordEncoder = passwordEncoder;
-//    }
-//
-//    public SessaoDTO autenticar(String email, String senhaPura) throws SQLException {
-//        final SessaoDTO[] resposta = new SessaoDTO[1];
-//
-//        TransactionManager.executeInTransaction(conn -> {
-//
-//            Usuario usuario = usuarioRepository.findByEmail(conn, email)
-//                .orElseThrow(() -> new IllegalArgumentException("Usuário ou senha incorretos."));
-//
-//            if (!passwordEncoder.matches(senhaPura, usuario.getSenhaHash())) {
-//                throw new IllegalArgumentException("Usuário ou senha incorretos.");
-//            }
-//
-//            Tenant tenant = tenantRepository.findTenantPorIdSemTenantId(conn, usuario.getTenantId())
-//                .orElseThrow(() -> new SQLException("Tenant escopo não encontrado no ecossistema."));
-//
-//            Empresa empresa = null;
-//            if (usuario.getEmpresaPadraoId() != null && usuario.getEmpresaPadraoId() > 0) {
-//                empresa = empresaRepository.findEmpresaPorIdSemTenantId(conn, usuario.getEmpresaPadraoId())
-//                    .orElse(null); 
-//            }
-//
-//            SessaoUsuario sessao = new SessaoUsuario();
-//            String token64 = (UUID.randomUUID().toString() + UUID.randomUUID().toString())
-//                                .replace("-", "").substring(0, 64);
-//
-//            sessao.setId(token64);
-//            sessao.setTenantId(usuario.getTenantId());
-//            sessao.setUsuarioId(usuario.getId());
-//            sessao.setEmpresaAtivaId(empresa != null ? empresa.getId() : null);
-//            sessao.setExpiraEm(LocalDateTime.now().plusHours(8));
-//
-//            sessaoUsuarioRepository.insert(conn, sessao);
-//
-//            // 🛠️ VINCULAÇÃO DE SESSÃO GLOBAL PARA O JAVAFX
-//            SessionManager.iniciarSessao(usuario, tenant, empresa);
-//
-//            resposta[0] = new SessaoDTO(usuario, tenant, empresa);
-//        });
-//
-//        return resposta[0];
-//    }
-//}

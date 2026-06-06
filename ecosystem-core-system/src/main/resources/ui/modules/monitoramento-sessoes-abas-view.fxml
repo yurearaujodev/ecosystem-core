@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="15.0" alignment="TOP_LEFT" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="br.com.yat.ecosystemcore.ui.modules.system.MonitoramentoSessoesController" 
+      style="-fx-background-color: #f8f9fa;" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" 
+      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <VBox HBox.hgrow="ALWAYS">
+            <Label text="Monitoramento de Segurança e Auditoria" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Label text="Gerencie os acessos ativos em tempo real e inspecione logs de autenticação do seu Tenant." style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+        </VBox>
+        <Button text="Atualizar Dados" onAction="#carregarDadosPainel" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <TabPane fx:id="tabPanePrincipal" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-width: 1;">
+        <tabs>
+            <Tab text="Sessões Ativas">
+                <content>
+                    <VBox spacing="10.0">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="Usuários Conectados Atualmente" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="btnDerrubar" text="Derrubar Sessão Selecionada" onAction="#handleDerrubarSessao" disable="true"
+                                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        </HBox>
+                        
+                        <TableView fx:id="tableSessoes" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colUsuario" text="Usuário" prefWidth="180.0"/>
+                                <TableColumn fx:id="colEmail" text="E-mail" prefWidth="180.0"/>
+                                <TableColumn fx:id="colEmpresa" text="Empresa Ativa" prefWidth="150.0"/>
+                                <TableColumn fx:id="colIp" text="Endereço IP" prefWidth="120.0"/>
+                                <TableColumn fx:id="colDispositivo" text="Dispositivo / Sistema" prefWidth="200.0"/>
+                                <TableColumn fx:id="colCriadoEm" text="Conectado Em" prefWidth="140.0"/>
+                            </columns>
+                            <placeholder>
+                                <Label text="Nenhum usuário conectado no momento."/>
+                            </placeholder>
+                        </TableView>
+                    </VBox>
+                </content>
+            </Tab>
+
+            <Tab text="Histórico de Logins">
+                <content>
+                    <VBox spacing="10.0">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+                        <Label text="Registro Recente de Tentativas de Autenticação" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                        
+                        <TableView fx:id="tableTentativas" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colTentativaEmail" text="E-mail Informado" prefWidth="200.0"/>
+                                <TableColumn fx:id="colTentativaIp" text="IP de Origem" prefWidth="130.0"/>
+                                <TableColumn fx:id="colTentativaStatus" text="Status" prefWidth="100.0"/>
+                                <TableColumn fx:id="colTentativaMotivo" text="Motivo do Bloqueio / Falha" prefWidth="250.0"/>
+                                <TableColumn fx:id="colTentativaData" text="Data/Hora" prefWidth="150.0"/>
+                                <TableColumn fx:id="colTentativaDispositivo" text="Informações do Terminal" prefWidth="200.0"/>
+                            </columns>
+                            <placeholder>
+                                <Label text="Nenhum log de autenticação registrado para este Tenant."/>
+                            </placeholder>
+                        </TableView>
+                    </VBox>
+                </content>
+            </Tab>
+        </tabs>
+    </TabPane>
+</VBox>

@@ -1,7 +1,10 @@
 package br.com.yat.ecosystemcore.ui.modules.empresa;
 
 import br.com.yat.ecosystemcore.domain.entity.Empresa;
+import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors; // ⚡ Importado para evitar travar a UI
+import br.com.yat.ecosystemcore.infrastructure.security.Sessao;
 import br.com.yat.ecosystemcore.service.external.EmpresaService;
+import javafx.application.Platform; // ⚡ Importado para atualizar a tabela na Thread correta
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -29,15 +32,6 @@ public class EmpresaConsultaController {
 
     private final EmpresaService empresaService = new EmpresaService();
     private final ObservableList<Empresa> masterData = FXCollections.observableArrayList();
-
-//    @FXML
-//    public void initialize() {
-//        configurarColunas();
-//     // MELHORIA: Mensagem amigável quando a tabela não tiver registros
-//        tblEmpresas.setPlaceholder(new Label("Nenhuma empresa cadastrada para esta conta corporativa."));
-//        carregarDados();
-//        configurarFiltroPesquisa();
-//    }
     
     @FXML
     public void initialize() {
@@ -49,7 +43,7 @@ public class EmpresaConsultaController {
         // 2. Configuramos as colunas normalmente
         configurarColunas();
         
-        // 3. Buscamos do banco (retornando as 0 empresas do log)
+        // 3. Buscamos do banco (Despachado assincronamente)
         carregarDados();
         
         // 4. Montamos o filtro
@@ -65,78 +59,58 @@ public class EmpresaConsultaController {
         colRazaoSocial.setCellValueFactory(new PropertyValueFactory<>("razaoSocial"));
         colNomeFantasia.setCellValueFactory(new PropertyValueFactory<>("nomeFantasia"));
         
-        // CORREÇÃO AQUI: Montamos a string final antes de passar para a Lambda do Binding
         colCidade.setCellValueFactory(cellData -> {
             Empresa emp = cellData.getValue();
             
             String cidade = emp.getCidade() != null ? emp.getCidade() : "";
             String estado = emp.getEstado() != null ? emp.getEstado() : "";
             
-            // Cria a string final que não será mais alterada
             final String resultadoCidadeUf = (cidade.isEmpty() || estado.isEmpty()) 
                     ? cidade + estado 
                     : cidade + "/" + estado;
 
-            // Agora passamos a variável final segura para a Lambda interna
             return javafx.beans.binding.Bindings.createStringBinding(() -> resultadoCidadeUf);
         });
 
         adicionarBotoesAcao();
     }
+
     private void carregarDados() {
-        try {
-            masterData.clear();
-            
-            List<Empresa> empresas = empresaService.listarEmpresasDoTenantAtivo();
-            
-            // Log temporário no console para você ver se o banco está respondendo
-            System.out.println("DEBUG: Quantidade de empresas retornadas do banco: " + (empresas != null ? empresas.size() : 0));
-            
-            if (empresas != null && !empresas.isEmpty()) {
-                masterData.addAll(empresas);
-            }
-            
-        } catch (Exception e) {
-            // Imprime o erro completo no console da IDE para descobrirmos o culpado real
-            System.err.println("❌ ERRO GRAVE NO CARREGAMENTO:");
-            e.printStackTrace(); 
-            
-            exibirAlertaError("Erro de Carregamento", "Não foi possível carregar a listagem.", e.getMessage());
+        // 🔒 VALIDAÇÃO DE SEGURANÇA: Bloqueia a consulta se não houver uma sessão ativa
+        if (!Sessao.isActive() || Sessao.tenant() == null) {
+            System.err.println("⚠️ TENTATIVA DE ACESSO NEGADA: Nenhuma sessão corporativa ativa.");
+            exibirAlertaError("Erro de Segurança", "Acesso Negado", "Você precisa estar autenticado para listar as empresas.");
+            return;
         }
+
+        // ⚡ Busca pesada roda no Executor exclusivo de banco, sem congelar a interface
+        AppExecutors.getDatabaseExecutor().execute(() -> {
+            try {
+                List<Empresa> empresas = empresaService.listarEmpresasDoTenantAtivo();
+                
+                System.out.println("DEBUG: Quantidade de empresas retornadas do banco: " + (empresas != null ? empresas.size() : 0));
+                
+                Platform.runLater(() -> {
+                    masterData.clear();
+                    if (empresas != null && !empresas.isEmpty()) {
+                        masterData.addAll(empresas);
+                    }
+                });
+                
+            } catch (Exception e) {
+                System.err.println("❌ ERRO GRAVE NO CARREGAMENTO:");
+                e.printStackTrace(); 
+                
+                Platform.runLater(() -> 
+                    exibirAlertaError("Erro de Carregamento", "Não foi possível carregar a listagem.", e.getMessage())
+                );
+            }
+        });
     }
-
-//    private void carregarDados() {
-//        try {
-//            masterData.clear();
-//            List<Empresa> empresas = empresaService.listarEmpresasDoTenantAtivo();
-//            masterData.addAll(empresas);
-//            tblEmpresas.setItems(masterData);
-//        } catch (Exception e) {
-//            exibirAlertaError("Erro de Carregamento", "Não foi possível carregar a listagem de empresas.", e.getMessage());
-//        }
-//    }
-
-//    private void configurarFiltroPesquisa() {
-//        FilteredList<Empresa> filteredData = new FilteredList<>(masterData, p -> true);
-//        txtPesquisa.textProperty().addListener((observable, oldValue, newValue) -> {
-//            filteredData.setPredicate(empresa -> {
-//                if (newValue == null || newValue.trim().isEmpty()) return true;
-//                
-//                String lowerCaseFilter = newValue.toLowerCase().trim();
-//                if (empresa.getRazaoSocial().toLowerCase().contains(lowerCaseFilter)) return true;
-//                if (empresa.getCnpj().contains(lowerCaseFilter)) return true;
-//                if (empresa.getUuidPublico().contains(lowerCaseFilter)) return true;
-//                return false;
-//            });
-//        });
-//        tblEmpresas.setItems(filteredData);
-//    }
     
     private void configurarFiltroPesquisa() {
-        // Cria a lista filtrada baseada no nosso masterData
         FilteredList<Empresa> filteredData = new FilteredList<>(masterData, p -> true);
         
-        // Ouvinte para mudanças no campo de texto de pesquisa
         txtPesquisa.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(empresa -> {
                 if (newValue == null || newValue.trim().isEmpty()) {
@@ -151,10 +125,7 @@ public class EmpresaConsultaController {
             });
         });
         
-        // Vincula a lista filtrada à tabela
         tblEmpresas.setItems(filteredData);
-        
-        // Força a tabela a atualizar e reconhecer que está vazia no momento do boot
         tblEmpresas.refresh();
     }
 
@@ -215,11 +186,9 @@ public class EmpresaConsultaController {
             dialogStage.initOwner(tblEmpresas.getScene().getWindow());
             dialogStage.setScene(new javafx.scene.Scene(root));
             
-            // Trava o redimensionamento para manter o layout intocado e limpo
             dialogStage.setResizable(false); 
             dialogStage.showAndWait();
 
-            // Se o usuário clicou em salvar com sucesso, atualiza a grade de dados imediatamente
             if (controller.isSalvoComSucesso()) {
                 carregarDados();
             }
@@ -235,12 +204,17 @@ public class EmpresaConsultaController {
         alert.setContentText("Empresa: " + empresa.getRazaoSocial() + "\nEsta ação poderá ser revertida por administradores.");
 
         if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-            try {
-                empresaService.excluirEmpresa(empresa.getId());
-                carregarDados(); // Recarrega a grade aplicando o Soft Delete imediato
-            } catch (Exception e) {
-                exibirAlertaError("Falha na Operação", "Não foi possível remover logicamente o registro.", e.getMessage());
-            }
+            // ⚡ EXCLUSÃO ASSÍNCRONA: Executa fora da thread principal para manter a interface fluida
+            AppExecutors.getDatabaseExecutor().execute(() -> {
+                try {
+                    empresaService.excluirEmpresa(empresa.getId());
+                    carregarDados(); 
+                } catch (Exception e) {
+                    Platform.runLater(() -> 
+                        exibirAlertaError("Falha na Operação", "Não foi possível remover logicamente o registro.", e.getMessage())
+                    );
+                }
+            });
         }
     }
 

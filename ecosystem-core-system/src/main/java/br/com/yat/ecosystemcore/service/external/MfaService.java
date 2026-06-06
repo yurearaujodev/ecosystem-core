@@ -2,7 +2,7 @@ package br.com.yat.ecosystemcore.service.external;
 
 import br.com.yat.ecosystemcore.application.system.dto.MfaConfigDTO;
 import br.com.yat.ecosystemcore.infrastructure.database.TransactionManager;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
+import br.com.yat.ecosystemcore.infrastructure.security.SessionScope;
 import br.com.yat.ecosystemcore.repository.perfil.UsuarioMfaRepository;
 
 import java.sql.Connection;
@@ -10,7 +10,6 @@ import java.sql.SQLException;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
-import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 
 public class MfaService {
 
@@ -21,22 +20,42 @@ public class MfaService {
     private static final String ISSUER = "YatEcosystem";
 
     /**
-     * Passo 1: Inicia a configuração do MFA gerando chaves oficiais da biblioteca GoogleAuth
+     * Passo 1: Inicia a configuração do MFA gerando chaves oficiais da biblioteca GoogleAuth.
+     * ⚡ ATUALIZADO: Agora usa SessionScope e garante atomicidade transacional na geração de chaves.
      */
     public MfaConfigDTO iniciarConfiguracaoMfa(Long usuarioId, String emailUsuario) throws SQLException {
-        String tenantId = SessionManager.getTenantAtual().getId();
+        // 🔒 ATUALIZADO: Validação e captura do escopo de segurança novo
+        if (SessionScope.tenant() == null) {
+            throw new IllegalStateException("Nenhum tenant ativo na sessão para configurar o MFA.");
+        }
+        
+        String tenantId = SessionScope.tenant().getId();
         
         // 1. Gera as chaves usando o componente nativo do com.warrenstrange
         GoogleAuthenticatorKey credentials = gAuth.createCredentials();
         String novoSegredo = credentials.getKey();
 
-        // 2. O próprio GoogleAuth cria o link oficial otpauth:// mapeado e seguro
-        String qrCodeUrl = GoogleAuthenticatorQRGenerator.getOtpAuthURL(ISSUER, emailUsuario, credentials);
+        // 🛡️ Sanitiza o email e monta a URL encodada manualmente.
+        String emailSanitizado = emailUsuario != null ? emailUsuario.trim() : "usuario";
+        
+        String labelEncodado = java.net.URLEncoder.encode(ISSUER + ":" + emailSanitizado, java.nio.charset.StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20"); // Garante que espaços virem %20 e não +
+                
+        String issuerEncodado = java.net.URLEncoder.encode(ISSUER, java.nio.charset.StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
 
-        // 3. Salva no banco de dados participando da conexão atual do TransactionManager
-        try (Connection conn = TransactionManager.getConnection()) {
-            repository.salvarNovoSegredo(conn, usuarioId, tenantId, novoSegredo);
-        }
+        // Formato padrão mundial aceito por qualquer leitor:
+        String qrCodeUrl = String.format(
+            "otpauth://totp/%s?secret=%s&issuer=%s",
+            labelEncodado,
+            novoSegredo,
+            issuerEncodado
+        );
+
+        // ⚡ INTEGRADO: Executa a gravação do novo segredo garantindo o commit da transação
+        TransactionManager.executeVoidInTransaction(conn -> 
+            repository.salvarNovoSegredo(conn, usuarioId, tenantId, novoSegredo)
+        );
 
         return new MfaConfigDTO(usuarioId, novoSegredo, qrCodeUrl, false);
     }
@@ -68,7 +87,7 @@ public class MfaService {
     }
 
     /**
-     * Desativa e remove completamente o registro de MFA do usuário
+     * Desativa e remove completamente o registro de MFA do usuário.
      */
     public void desativarMfa(Long usuarioId) throws SQLException {
         try (Connection conn = TransactionManager.getConnection()) {
@@ -77,7 +96,7 @@ public class MfaService {
     }
 
     /**
-     * Verifica se o MFA está ativo (Muito útil para interceptar o fluxo de login posteriormente)
+     * Verifica se o MFA está ativo (Muito útil para interceptar o fluxo de login posteriormente).
      */
     public boolean isMfaAtivo(Long usuarioId) throws SQLException {
         try (Connection conn = TransactionManager.getConnection()) {

@@ -9,4 +9,12 @@ public record DatabaseStatus(boolean available, String message, String details) 
 	public static DatabaseStatus error(String userMessage) {
 		return new DatabaseStatus(false, userMessage, "INDISPONÍVEL");
 	}
+	
+	public boolean isAvailable() {
+        return available;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }

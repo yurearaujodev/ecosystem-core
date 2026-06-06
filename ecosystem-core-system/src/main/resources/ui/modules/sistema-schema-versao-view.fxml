@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="br.com.yat.ecosystemcore.ui.modules.system.SistemaSchemaVersaoController"
+      spacing="15" prefWidth="900" prefHeight="600" style="-fx-background-color: #f4f6f9;">
+    
+    <padding>
+        <Insets top="15" right="15" bottom="15" left="15"/>
+    </padding>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <VBox>
+            <Label text="📦 Painel de DevOps &amp; Infraestrutura" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Label text="Sincronização de código-fonte (Git) e integridade estrutural do banco de dados." style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="🔄 Atualizar Painel" onAction="#atualizarTudo" style="-fx-cursor: hand; -fx-background-color: #34495e; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;"/>
+    </HBox>
+    <Separator/>
+
+    <HBox spacing="15" prefHeight="100">
+        
+        <VBox spacing="5" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
+            <Label text="🐱 REPOSITÓRIO GITHUB" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Branch:" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblGitBranch" text="Carregando..."/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Commit Local:" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblGitCommitLocal" text="..."/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Status do Código:" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblGitStatus" text="Verificando..." style="-fx-font-weight: bold;"/>
+            </HBox>
+        </VBox>
+
+        <VBox spacing="5" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 12;">
+            <Label text="🗄️ BANCO DE DADOS ATIVO" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Host/Ambiente:" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblDbUrl" text="Carregando..." wrapText="true"/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Usuário Conectado:" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblDbUser" text="..."/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Status do Pool:" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblDbStatus" text="Verificando..." style="-fx-font-weight: bold;"/>
+            </HBox>
+        </VBox>
+    </HBox>
+
+    <VBox spacing="5" VBox.vgrow="ALWAYS">
+        <Label text="📜 Linha do Tempo de Migrações (Tabela 'schema_version')" style="-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-size: 14px;"/>
+        <TableView fx:id="tblSchema" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+                <TableColumn fx:id="colVersao" text="Versão DDL" prefWidth="110"/>
+                <TableColumn fx:id="colDesc" text="Modificação Aplicada" prefWidth="380"/>
+                <TableColumn fx:id="colAutor" text="Executado Por" prefWidth="150"/>
+                <TableColumn fx:id="colData" text="Instalado Em" prefWidth="160"/>
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>

@@ -3,11 +3,11 @@ package br.com.yat.ecosystemcore.domain.entity;
 import java.time.LocalDateTime;
 
 public class SessaoUsuario {
-    private String id; // CHAR(64)
-    private String tenantId; // CHAR(36)
+    private String id; 
+    private String tenantId; 
     private Long usuarioId;
     private Long empresaAtivaId;
-    private String tokenAtualizacao; // refresh_token CHAR(64)
+    private String tokenAtualizacao; 
     private LocalDateTime refreshExpiraEm;
     private String ipOrigem;
     private String dispositivoInfo;
@@ -16,6 +16,10 @@ public class SessaoUsuario {
     private LocalDateTime revogadoEm;
 
     public SessaoUsuario() {}
+
+    public boolean isValida() {
+        return revogadoEm == null && (expiraEm == null || LocalDateTime.now().isBefore(expiraEm));
+    }
 
     // Getters e Setters
     public String getId() { return id; }

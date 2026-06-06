@@ -8,7 +8,7 @@ import br.com.yat.ecosystemcore.domain.entity.Empresa;
 import br.com.yat.ecosystemcore.domain.entity.EmpresaUsuarioDetalheDTO;
 import br.com.yat.ecosystemcore.domain.enums.MenuChave;
 import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionManager;
+import br.com.yat.ecosystemcore.infrastructure.security.Sessao;
 import br.com.yat.ecosystemcore.service.external.EmpresaService;
 import br.com.yat.ecosystemcore.service.external.UsuarioService;
 import br.com.yat.ecosystemcore.ui.core.ContextAware;
@@ -33,6 +33,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -41,7 +42,6 @@ public class MenuController implements Initializable {
     @FXML private MenuBar menuBar;
     @FXML private StackPane conteudoCentral;
     
-    // 🏷️ Componentes do Painel Lateral e Barra de Status vinculados ao FXML
     @FXML private Label lblUsuarioLogado;
     @FXML private Label lblHora;
     @FXML private Label lblTempoAcesso;
@@ -55,6 +55,7 @@ public class MenuController implements Initializable {
     private NavigationManager navigationManager;
     private final MenuProvider menuProvider = MenuProviderFactory.create();
     private final EmpresaService empresaService = new EmpresaService();
+    private final UsuarioService usuarioService = new UsuarioService();
     
     private long segundosLogado = 0;
     private Timeline relogioCorporativo;
@@ -63,55 +64,57 @@ public class MenuController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.navigationManager = new NavigationManager(conteudoCentral);
         
-        // 1. Carrega os menus do banco
         montarMenu();
-        
-        // 2. Captura os dados reais da Sessão Estável e renderiza no painel
         exibirDadosSessao();
-        
-        // 3. Inicia o Timer em background para a data/hora e tempo de sessão
         iniciarRelogioSistema();
         configurarSeletorEmpresa();
     }
 
     private void configurarSeletorEmpresa() {
-        Long usuarioId = SessionManager.getUsuarioLogado().getId();
-        String tenantId = SessionManager.getTenantAtual().getId();
+        // 🔒 Centralizado para usar a classe estável Sessao
+        if (!Sessao.isActive() || Sessao.usuario() == null) return;
 
+        // Captura o ID do usuário conectado no contexto atual para passar ao serviço
+        Long usuarioLogadoId = Sessao.usuario().getId();
+
+        // Dispara a busca pesada de banco no Pool assíncrono para nunca travar a renderização (UI Thread) do JavaFX
         AppExecutors.getDatabaseExecutor().execute(() -> {
             try {
-                // Reutilizando seu método do repositório
-                var vinculos = new UsuarioService().listarVinculosEmpresa(usuarioId, tenantId);
+                // ⚡ CORRIGIDO: Passando o ID exigido pela assinatura do método na UsuarioService
+                // Ao especificar o parâmetro, o Java infere corretamente o tipo List<EmpresaUsuarioDetalheDTO>
+                List<EmpresaUsuarioDetalheDTO> vinculos = usuarioService.listarVinculosEmpresa(usuarioLogadoId);
                 
                 Platform.runLater(() -> {
-                    cbSeletorEmpresa.getItems().addAll(vinculos);
-                    // Seleciona a que já está na sessão
-                    cbSeletorEmpresa.getSelectionModel().select(
-                        vinculos.stream()
-                            .filter(v -> v.getEmpresaId().equals(SessionManager.getEmpresaFilial().getId()))
-                            .findFirst().orElse(null)
-                    );
+                    cbSeletorEmpresa.getItems().setAll(vinculos);
                     
+                    // 🔒 Captura segura através da nova fachada corporativa
+                    Empresa empresaSessao = Sessao.empresa();
+                    if (empresaSessao != null) {
+                        cbSeletorEmpresa.getSelectionModel().select(
+                            vinculos.stream()
+                                .filter(v -> v.getEmpresaId().equals(empresaSessao.getId()))
+                                .findFirst().orElse(null)
+                        );
+                    }
                 });
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
-     // No topo da classe MenuController
-       
-
-        // No seu método configurarSeletorEmpresa() (que discutimos anteriormente):
+        // Evento gatilho acionado quando o usuário clica para alternar de filial corporativa
         cbSeletorEmpresa.setOnAction(e -> {
             EmpresaUsuarioDetalheDTO selecao = cbSeletorEmpresa.getValue();
             if (selecao != null) {
                 AppExecutors.getDatabaseExecutor().execute(() -> {
                     try {
                         Empresa empresaCompleta = empresaService.buscarPorId(selecao.getEmpresaId());
-                        SessionManager.setEmpresaFilial(empresaCompleta);
                         
+                        // 🚀 Atualiza o contexto mutável de filiais corporativas de forma limpa e monitorada
+                        br.com.yat.ecosystemcore.infrastructure.security.SessionScope.trocarEmpresa(empresaCompleta);
+                        
+                        // Alerta de forma reativa a tela/view que está aberta que o contexto mudou
                         Platform.runLater(() -> {
-                            // Notifica a tela ativa
                             Object ctrl = navigationManager.getControllerAtual();
                             if (ctrl instanceof ContextAware) {
                                 ((ContextAware) ctrl).onContextChanged();
@@ -148,15 +151,14 @@ public class MenuController implements Initializable {
     }
 
     private void exibirDadosSessao() {
-        // 🔒 Validação da Sessão Estável Multi-Tenant
-        if (SessionManager.getUsuarioLogado() != null) {
-            String email = SessionManager.getUsuarioLogado().getEmail();
+        // 🔒 MODIFICADO: Atualizado para o padrão intuitivo Sessao
+        if (Sessao.isActive() && Sessao.usuario() != null) {
+            String email = Sessao.usuario().getEmail();
             lblUsuarioLogado.setText(email);
         } else {
             lblUsuarioLogado.setText("Usuário Anônimo");
         }
         
-        // Atualiza a barra inferior para indicar sucesso de conexão ativa com o Pool Hikari
         lblStatusBanco.setText("CONECTADO (HIKARI)");
         lblStatusBanco.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #2B8A3E;");
     }
@@ -165,10 +167,7 @@ public class MenuController implements Initializable {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         
         relogioCorporativo = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-            // Atualiza Data e Hora atual
             lblHora.setText(LocalDateTime.now().format(formatter));
-            
-            // Calcula e formata Tempo de Acesso
             segundosLogado++;
             long h = segundosLogado / 3600;
             long m = (segundosLogado % 3600) / 60;
@@ -183,7 +182,6 @@ public class MenuController implements Initializable {
     @FXML
     private void onNavigate(ActionEvent event) {
         MenuItem item = (MenuItem) event.getSource();
-
         if (item.getUserData() instanceof MenuChave chave) {
             navigationManager.navigatePara(chave);
         }
@@ -195,16 +193,11 @@ public class MenuController implements Initializable {
             relogioCorporativo.stop();
         }
         navigationManager.forcarLimpezaCache();
+        
+        // 🔒 MODIFICADO: Invoca o encerramento seguro. Isso limpa a memória local
+        // e dispara a invalidação no cache Caffeine além de atualizar o banco com 'revogado_em'
+        Sessao.logout(); 
+        
         Platform.exit();
-    }
-    
-    private void mostrarAlertaErro(String titulo, String mensagem) {
-        Platform.runLater(() -> {
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
-            alert.setTitle(titulo);
-            alert.setHeaderText(null);
-            alert.setContentText(mensagem);
-            alert.showAndWait();
-        });
     }
 }
