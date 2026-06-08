@@ -2,8 +2,8 @@ package br.com.yat.ecosystemcore.ui.modules.pessoa;
 
 import br.com.yat.ecosystemcore.domain.entity.Pessoa;
 import br.com.yat.ecosystemcore.service.external.PessoaService;
-import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
-import br.com.yat.ecosystemcore.infrastructure.security.Sessao;
+import br.com.yat.ecosystemcore.shared.context.Sessao;
+import br.com.yat.ecosystemcore.shared.current.AppExecutors;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;

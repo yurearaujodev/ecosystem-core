@@ -6,7 +6,7 @@ import br.com.yat.ecosystemcore.repository.perfil.EmpresaUsuarioRepository;
 import br.com.yat.ecosystemcore.repository.perfil.PerfilRepository;
 import br.com.yat.ecosystemcore.repository.tenant.TenantRepository;
 import br.com.yat.ecosystemcore.repository.usuario.PessoaRepository;
-import br.com.yat.ecosystemcore.repository.usuario.UsuarioRepository;
+import br.com.yat.ecosystemcore.ui.modules.usuario.repository.UsuarioRepository;
 
 public final class OnboardingTenantUseCaseFactory {
 

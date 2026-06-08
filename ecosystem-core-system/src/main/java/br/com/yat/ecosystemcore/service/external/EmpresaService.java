@@ -2,8 +2,8 @@ package br.com.yat.ecosystemcore.service.external;
 
 import br.com.yat.ecosystemcore.domain.entity.Empresa;
 import br.com.yat.ecosystemcore.repository.empresa.EmpresaRepository;
-import br.com.yat.ecosystemcore.infrastructure.database.TransactionManager;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionScope;
+import br.com.yat.ecosystemcore.shared.context.SessionScope;
+import br.com.yat.ecosystemcore.shared.database.TransactionManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;

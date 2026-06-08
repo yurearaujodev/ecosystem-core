@@ -1,8 +1,8 @@
 package br.com.yat.ecosystemcore.service.external;
 
 import br.com.yat.ecosystemcore.domain.entity.Perfil;
-import br.com.yat.ecosystemcore.infrastructure.database.TransactionManager;
 import br.com.yat.ecosystemcore.repository.perfil.PerfilRepository;
+import br.com.yat.ecosystemcore.shared.database.TransactionManager;
 
 import java.sql.SQLException;
 import java.util.List;

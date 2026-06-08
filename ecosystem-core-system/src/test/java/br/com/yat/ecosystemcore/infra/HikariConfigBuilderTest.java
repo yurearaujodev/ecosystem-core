@@ -5,8 +5,8 @@ import java.util.Properties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.yat.ecosystemcore.infrastructure.database.HikariConfigBuilder;
 import br.com.yat.ecosystemcore.infrastructure.security.CryptoException;
+import br.com.yat.ecosystemcore.shared.database.HikariConfigBuilder;
 
 @DisplayName("Unidade - HikariConfigBuilder")
 class HikariConfigBuilderTest {

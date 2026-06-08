@@ -4,9 +4,9 @@ import br.com.yat.ecosystemcore.application.system.dto.AtualizarDetalhesUsuarioC
 import br.com.yat.ecosystemcore.application.system.dto.UsuarioSegurancaConfigDTO;
 import br.com.yat.ecosystemcore.application.system.usecase.SalvarDetalhesSegurancaUsuarioUseCase;
 import br.com.yat.ecosystemcore.domain.entity.EmpresaUsuarioDetalheDTO;
-import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
-import br.com.yat.ecosystemcore.infrastructure.database.TransactionManager;
 import br.com.yat.ecosystemcore.service.external.EmpresaUsuarioService;
+import br.com.yat.ecosystemcore.shared.current.AppExecutors;
+import br.com.yat.ecosystemcore.shared.database.TransactionManager;
 import br.com.yat.ecosystemcore.ui.core.ScreenLifecycle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;

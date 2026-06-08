@@ -1,8 +1,8 @@
 package br.com.yat.ecosystemcore.application.menu;
 
 import br.com.yat.ecosystemcore.application.menu.dto.MenuPermitidoDTO;
-import br.com.yat.ecosystemcore.infrastructure.database.ConnectionFactory;
 import br.com.yat.ecosystemcore.domain.enums.MenuChave;
+import br.com.yat.ecosystemcore.shared.database.ConnectionFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

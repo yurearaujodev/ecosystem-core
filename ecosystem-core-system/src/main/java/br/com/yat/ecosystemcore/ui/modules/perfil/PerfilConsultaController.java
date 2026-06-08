@@ -1,9 +1,9 @@
 package br.com.yat.ecosystemcore.ui.modules.perfil;
 
 import br.com.yat.ecosystemcore.domain.entity.Perfil;
-import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
-import br.com.yat.ecosystemcore.infrastructure.security.Sessao; // 🔒 Importação corrigida para a infraestrutura ativa
 import br.com.yat.ecosystemcore.service.external.PerfilService;
+import br.com.yat.ecosystemcore.shared.context.Sessao;
+import br.com.yat.ecosystemcore.shared.current.AppExecutors;
 import br.com.yat.ecosystemcore.ui.core.ContextAware;
 import br.com.yat.ecosystemcore.ui.core.ScreenLifecycle;
 import javafx.application.Platform;

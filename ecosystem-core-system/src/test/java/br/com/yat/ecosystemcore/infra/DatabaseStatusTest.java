@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.yat.ecosystemcore.infrastructure.database.DatabaseStatus;
+import br.com.yat.ecosystemcore.shared.database.DatabaseStatus;
 
 @DisplayName("Unidade - DatabaseStatus")
 class DatabaseStatusTest {

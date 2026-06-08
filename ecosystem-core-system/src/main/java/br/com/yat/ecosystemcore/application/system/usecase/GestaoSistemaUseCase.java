@@ -36,7 +36,7 @@ public class GestaoSistemaUseCase {
     public void refazerDisparoOutbox(UUID eventoId) throws SQLException {
         // Reseta o contador de tentativas e devolve o status para PENDING
         String sql = "UPDATE outbox_events SET status = 'PENDING', tentativas = 0, processado_em = NULL WHERE id = ?";
-        try (var conn = br.com.yat.ecosystemcore.infrastructure.database.ConnectionFactory.getConnection();
+        try (var conn = br.com.yat.ecosystemcore.shared.database.ConnectionFactory.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, eventoId.toString());
             stmt.executeUpdate();
@@ -47,7 +47,7 @@ public class GestaoSistemaUseCase {
     public void dispararJobAgora(String nomeJob, String grupo) throws SQLException {
         // Atualiza o status na tabela de controle para sinalizar ao Executor que rode a rotina imediatamente
         String sql = "UPDATE sistema_jobs_controle SET proxima_execucao = CURRENT_TIMESTAMP, status = 'RUNNING' WHERE job_name = ? AND job_group = ?";
-        try (var conn = br.com.yat.ecosystemcore.infrastructure.database.ConnectionFactory.getConnection();
+        try (var conn = br.com.yat.ecosystemcore.shared.database.ConnectionFactory.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nomeJob);
             stmt.setString(2, grupo);

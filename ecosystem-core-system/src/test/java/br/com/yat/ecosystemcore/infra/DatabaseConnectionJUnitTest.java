@@ -12,8 +12,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.yat.ecosystemcore.infrastructure.database.ConnectionFactory;
-import br.com.yat.ecosystemcore.infrastructure.database.DatabaseStatus;
+import br.com.yat.ecosystemcore.shared.database.ConnectionFactory;
+import br.com.yat.ecosystemcore.shared.database.DatabaseStatus;
 
 
 @DisplayName("Testes de Integração do Banco de Dados e Criptografia")

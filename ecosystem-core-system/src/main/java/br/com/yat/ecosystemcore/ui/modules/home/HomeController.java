@@ -1,7 +1,7 @@
 package br.com.yat.ecosystemcore.ui.modules.home;
 
+import br.com.yat.ecosystemcore.shared.context.SessionScope;
 import br.com.yat.ecosystemcore.ui.core.ScreenLifecycle;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionScope;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 

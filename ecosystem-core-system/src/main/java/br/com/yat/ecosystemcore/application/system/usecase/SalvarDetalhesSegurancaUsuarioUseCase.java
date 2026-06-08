@@ -1,11 +1,11 @@
 package br.com.yat.ecosystemcore.application.system.usecase;
 
 import br.com.yat.ecosystemcore.application.system.dto.AtualizarDetalhesUsuarioCommand;
-import br.com.yat.ecosystemcore.infrastructure.database.TransactionManager;
-import br.com.yat.ecosystemcore.infrastructure.security.Sessao;
 import br.com.yat.ecosystemcore.repository.perfil.UsuarioPermissaoRepository;
 import br.com.yat.ecosystemcore.repository.perfil.UsuarioSegurancaConfigRepository;
 import br.com.yat.ecosystemcore.service.external.EmpresaUsuarioService;
+import br.com.yat.ecosystemcore.shared.context.Sessao;
+import br.com.yat.ecosystemcore.shared.database.TransactionManager;
 
 import java.sql.SQLException;
 

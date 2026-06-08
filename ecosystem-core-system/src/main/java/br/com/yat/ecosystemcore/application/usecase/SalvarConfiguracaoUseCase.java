@@ -6,8 +6,8 @@ import java.util.function.Consumer;
 import br.com.yat.ecosystemcore.domain.dto.DatabaseForm;
 import br.com.yat.ecosystemcore.domain.entity.DatabaseConfig;
 import br.com.yat.ecosystemcore.domain.entity.DatabaseCredentials;
-import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
 import br.com.yat.ecosystemcore.service.external.DatabaseSetupService;
+import br.com.yat.ecosystemcore.shared.current.AppExecutors;
 
 public final class SalvarConfiguracaoUseCase {
     private final DatabaseSetupService setupService = new DatabaseSetupService();

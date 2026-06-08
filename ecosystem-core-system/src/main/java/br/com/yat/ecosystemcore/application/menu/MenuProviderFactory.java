@@ -1,6 +1,6 @@
 package br.com.yat.ecosystemcore.application.menu;
 
-import br.com.yat.ecosystemcore.repository.menu.MenuSistemaRepository; // Ajuste para o seu pacote correto
+//import br.com.yat.ecosystemcore.repository.menu.MenuSistemaRepository; // Ajuste para o seu pacote correto
 
 public final class MenuProviderFactory {
 

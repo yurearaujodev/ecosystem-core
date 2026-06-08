@@ -2,7 +2,7 @@ package br.com.yat.ecosystemcore.ui.core;
 
 import javafx.scene.Parent;
 
-public class ScreenNode {
+public final class ScreenNode {
 
     private final Parent view;
     private final Object controller;

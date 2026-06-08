@@ -6,10 +6,10 @@ import java.util.function.Consumer;
 import br.com.yat.ecosystemcore.domain.dto.DatabaseForm;
 import br.com.yat.ecosystemcore.domain.entity.DatabaseConfig;
 import br.com.yat.ecosystemcore.domain.entity.DatabaseCredentials;
-import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
-import br.com.yat.ecosystemcore.infrastructure.database.DatabaseStatus;
 import br.com.yat.ecosystemcore.service.external.DatabaseConnectionService;
 import br.com.yat.ecosystemcore.service.external.DatabaseSetupService;
+import br.com.yat.ecosystemcore.shared.current.AppExecutors;
+import br.com.yat.ecosystemcore.shared.database.DatabaseStatus;
 
 public final class TestarConexaoUseCase {
     private final DatabaseConnectionService connectionService = new DatabaseConnectionService();

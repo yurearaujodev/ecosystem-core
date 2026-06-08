@@ -1,8 +1,8 @@
 package br.com.yat.ecosystemcore.ui.modules.empresa;
 
 import br.com.yat.ecosystemcore.domain.entity.Empresa;
-import br.com.yat.ecosystemcore.infrastructure.security.Sessao; // 🔒 Atualizado para a nova fachada unificada
 import br.com.yat.ecosystemcore.service.external.EmpresaService;
+import br.com.yat.ecosystemcore.shared.context.Sessao;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;

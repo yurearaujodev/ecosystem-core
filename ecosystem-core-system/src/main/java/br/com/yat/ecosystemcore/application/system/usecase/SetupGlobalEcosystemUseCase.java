@@ -1,8 +1,9 @@
 package br.com.yat.ecosystemcore.application.system.usecase;
 
 import br.com.yat.ecosystemcore.application.system.dto.SetupEcosystemCommand;
-import br.com.yat.ecosystemcore.infrastructure.database.ConnectionFactory;
 import br.com.yat.ecosystemcore.infrastructure.database.DatabaseMenuSeeder;
+import br.com.yat.ecosystemcore.shared.database.ConnectionFactory;
+
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;

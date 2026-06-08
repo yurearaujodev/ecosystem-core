@@ -1,7 +1,8 @@
 package br.com.yat.ecosystemcore.repository.system;
 
 import br.com.yat.ecosystemcore.application.system.dto.*;
-import br.com.yat.ecosystemcore.infrastructure.database.ConnectionFactory;
+import br.com.yat.ecosystemcore.shared.database.ConnectionFactory;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

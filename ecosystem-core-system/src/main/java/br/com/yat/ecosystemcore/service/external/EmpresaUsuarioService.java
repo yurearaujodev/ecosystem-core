@@ -5,10 +5,10 @@ import br.com.yat.ecosystemcore.domain.entity.EmpresaUsuarioDetalheDTO;
 import br.com.yat.ecosystemcore.repository.perfil.EmpresaUsuarioRepository;
 import br.com.yat.ecosystemcore.repository.perfil.UsuarioPermissaoRepository;
 import br.com.yat.ecosystemcore.repository.perfil.UsuarioSegurancaConfigRepository;
+import br.com.yat.ecosystemcore.shared.context.Sessao;
+import br.com.yat.ecosystemcore.shared.database.TransactionManager;
 import br.com.yat.ecosystemcore.ui.modules.perfil.UsuarioGerenciamentoAbasController.CheckBoxListCellData;
 import br.com.yat.ecosystemcore.ui.modules.perfil.UsuarioGerenciamentoAbasController.CustomItem;
-import br.com.yat.ecosystemcore.infrastructure.database.TransactionManager;
-import br.com.yat.ecosystemcore.infrastructure.security.Sessao;
 
 import java.sql.Connection;
 import java.sql.SQLException;

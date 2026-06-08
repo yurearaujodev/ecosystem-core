@@ -2,10 +2,9 @@ package br.com.yat.ecosystemcore.ui.modules.system;
 
 import br.com.yat.ecosystemcore.domain.dto.SessaoAtivaProjecaoDTO;
 import br.com.yat.ecosystemcore.domain.entity.TentativaLoginLog;
-import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors;
 import br.com.yat.ecosystemcore.ui.core.ScreenLifecycle;
 import br.com.yat.ecosystemcore.service.external.AuditoriaSessaoService;
-
+import br.com.yat.ecosystemcore.shared.current.AppExecutors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;

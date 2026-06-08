@@ -3,9 +3,8 @@ package br.com.yat.ecosystemcore.ui.modules.system;
 import br.com.yat.ecosystemcore.application.system.dto.SchemaVersionDTO;
 import br.com.yat.ecosystemcore.application.system.usecase.GestaoSistemaUseCase;
 import br.com.yat.ecosystemcore.configuration.DatabaseConfigLoader;
-import br.com.yat.ecosystemcore.infrastructure.database.ConnectionFactory;
-import br.com.yat.ecosystemcore.infrastructure.database.DatabaseStatus;
-
+import br.com.yat.ecosystemcore.shared.database.ConnectionFactory;
+import br.com.yat.ecosystemcore.shared.database.DatabaseStatus;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;

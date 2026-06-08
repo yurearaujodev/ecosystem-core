@@ -21,7 +21,7 @@ module br.com.yat.ecosystemcore {
 	requires com.github.benmanes.caffeine;
 
     // EXPORTS: Garante acesso à classe App que está no bootstrap
-    exports br.com.yat.ecosystemcore.bootstrap;
+    exports br.com.yat.ecosystemcore.app;
     exports br.com.yat.ecosystemcore.ui.modules.banco; 
     exports br.com.yat.ecosystemcore.ui.core;
     exports br.com.yat.ecosystemcore.domain.enums;
@@ -30,7 +30,7 @@ module br.com.yat.ecosystemcore {
     exports br.com.yat.ecosystemcore.ui.modules.system;
     
     // OPENS: Abre as pastas que contêm arquivos e controllers para o JavaFX
-    opens br.com.yat.ecosystemcore.bootstrap to javafx.fxml;
+  //  opens br.com.yat.ecosystemcore.bootstrap to javafx.fxml;
     opens br.com.yat.ecosystemcore.ui.menu to javafx.fxml;
     opens br.com.yat.ecosystemcore.ui.core to javafx.fxml;
     opens br.com.yat.ecosystemcore.ui.modules.empresa to javafx.fxml;

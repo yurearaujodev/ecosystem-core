@@ -1,11 +1,11 @@
 package br.com.yat.ecosystemcore.service.external;
 
 import br.com.yat.ecosystemcore.domain.entity.Permissao;
-import br.com.yat.ecosystemcore.infrastructure.database.TransactionManager;
-import br.com.yat.ecosystemcore.infrastructure.security.Sessao;
 import br.com.yat.ecosystemcore.repository.perfil.PerfilPermissaoRepository;
 import br.com.yat.ecosystemcore.repository.perfil.PermissaoRepository;
 import br.com.yat.ecosystemcore.repository.perfil.UsuarioPermissaoRepository;
+import br.com.yat.ecosystemcore.shared.context.Sessao;
+import br.com.yat.ecosystemcore.shared.database.TransactionManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;

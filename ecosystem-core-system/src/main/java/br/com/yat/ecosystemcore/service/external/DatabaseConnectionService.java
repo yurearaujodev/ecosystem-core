@@ -2,8 +2,8 @@ package br.com.yat.ecosystemcore.service.external;
 
 import br.com.yat.ecosystemcore.domain.entity.DatabaseConfig;
 import br.com.yat.ecosystemcore.domain.entity.DatabaseCredentials;
-import br.com.yat.ecosystemcore.infrastructure.database.ConnectionFactory;
-import br.com.yat.ecosystemcore.infrastructure.database.DatabaseStatus;
+import br.com.yat.ecosystemcore.shared.database.ConnectionFactory;
+import br.com.yat.ecosystemcore.shared.database.DatabaseStatus;
 
 public class DatabaseConnectionService {
 

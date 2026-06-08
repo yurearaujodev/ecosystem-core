@@ -1,9 +1,9 @@
 package br.com.yat.ecosystemcore.ui.modules.empresa;
 
 import br.com.yat.ecosystemcore.domain.entity.Empresa;
-import br.com.yat.ecosystemcore.infrastructure.concurrent.AppExecutors; // ⚡ Importado para evitar travar a UI
-import br.com.yat.ecosystemcore.infrastructure.security.Sessao;
 import br.com.yat.ecosystemcore.service.external.EmpresaService;
+import br.com.yat.ecosystemcore.shared.context.Sessao;
+import br.com.yat.ecosystemcore.shared.current.AppExecutors;
 import javafx.application.Platform; // ⚡ Importado para atualizar a tabela na Thread correta
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

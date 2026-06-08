@@ -1,26 +1,26 @@
 package br.com.yat.ecosystemcore.application.menu;
 
-import br.com.yat.ecosystemcore.domain.entity.Usuario;
-import br.com.yat.ecosystemcore.infrastructure.security.SessionScope;
+import br.com.yat.ecosystemcore.shared.context.SessionContext;
+import br.com.yat.ecosystemcore.shared.context.SessionScope;
 
 /**
- * Contexto mínimo do usuário para filtragem futura de menus via {@code permissao_menu}.
+ * Contexto mínimo do usuário para filtragem futura de menus via
+ * {@code permissao_menu}.
  */
-public record MenuUsuarioContext(
-        String tenantId,
-        Long usuarioId
-) {
+public record MenuUsuarioContext(String tenantId, Long usuarioId) {
 
-    public static MenuUsuarioContext fromSession() {
-        // 🔒 ATUALIZADO: Agora usa o SessionScope estável da nova arquitetura
-        if (!SessionScope.isActive() || SessionScope.usuario() == null) {
-            // Retorna zerado temporariamente para evitar quebras se a tela for inicializada precocemente
-            return new MenuUsuarioContext(null, null);
-        }
-        
-        Usuario usuario = SessionScope.usuario();
-        String tenantId = SessionScope.tenant() != null ? SessionScope.tenant().getId() : usuario.getTenantId();
-        
-        return new MenuUsuarioContext(tenantId, usuario.getId());
-    }
+	public boolean valido() {
+		return tenantId != null && usuarioId != null;
+	}
+
+	public static MenuUsuarioContext fromSession() {
+
+		SessionContext ctx = SessionScope.get();
+
+		if (ctx == null) {
+			return null;
+		}
+
+		return new MenuUsuarioContext(ctx.getTenantId(), ctx.getUsuarioId());
+	}
 }

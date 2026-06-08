@@ -2,7 +2,8 @@ package br.com.yat.ecosystemcore.application.usuario.dto;
 
 import br.com.yat.ecosystemcore.domain.entity.Empresa;
 import br.com.yat.ecosystemcore.domain.entity.Tenant;
-import br.com.yat.ecosystemcore.domain.entity.Usuario;
+import br.com.yat.ecosystemcore.ui.modules.usuario.entity.Usuario;
+
 import java.time.LocalDateTime;
 
 public class SessaoDTO {
@@ -44,7 +45,7 @@ public class SessaoDTO {
     public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
 
     // Setters para os objetos base (caso precise popular manualmente)
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
-    public void setTenant(Tenant tenant) { this.tenant = tenant; }
-    public void setEmpresa(Empresa empresa) { this.empresa = empresa; }
+//    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+//    public void setTenant(Tenant tenant) { this.tenant = tenant; }
+//    public void setEmpresa(Empresa empresa) { this.empresa = empresa; }
 }

@@ -6,8 +6,8 @@ import br.com.yat.ecosystemcore.application.usecase.SalvarConfiguracaoUseCase;
 import br.com.yat.ecosystemcore.application.usecase.TestarConexaoUseCase;
 import br.com.yat.ecosystemcore.domain.dto.DatabaseForm;
 import br.com.yat.ecosystemcore.domain.entity.DatabaseConfig;
-import br.com.yat.ecosystemcore.infrastructure.database.DatabaseStatus;
 import br.com.yat.ecosystemcore.service.external.DatabaseSetupService;
+import br.com.yat.ecosystemcore.shared.database.DatabaseStatus;
 
 public final class DatabaseSetupFacade {
     
