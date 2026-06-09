@@ -131,7 +131,7 @@
 					<execution>
 						<id>default-cli</id>
 						<configuration>
-							<mainClass>br.com.yat.ecosystemcore.bootstrap.App</mainClass>
+							<mainClass>br.com.yat.ecosystemcore.app.AppLauncher</mainClass>
 						</configuration>
 					</execution>
 				</executions>

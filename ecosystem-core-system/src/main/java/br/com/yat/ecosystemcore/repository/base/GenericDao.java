@@ -63,6 +63,11 @@ public abstract class GenericDao<T, PK> {
         }
         return lista;
     }
+    
+    public List<T> findAllByTenant(Connection conn, String tenantId) throws SQLException {
+        String sql = "SELECT * FROM " + tableName + " WHERE tenant_id = ? AND deleted_at IS NULL";
+        return executeQuery(conn, sql, tenantId);
+    }
 
     /**
      * Busca no máximo um registro mapeado pela entidade do DAO ({@link #mapResultSetToEntity}).
@@ -112,6 +117,37 @@ public abstract class GenericDao<T, PK> {
         }
         return null;
     }
+    
+    protected <R> R executeQueryForScalar(Connection conn, String sql, Class<R> clazz, Object... params) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            bindParameters(stmt, params);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Object value = rs.getObject(1);
+                    return convertValue(value, clazz);
+                }
+            }
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <R> R convertValue(Object value, Class<R> clazz) {
+        if (value == null) return null;
+        if (clazz.isInstance(value)) return clazz.cast(value);
+
+        // Lida com conversões numéricas usando Pattern Matching
+        return switch (value) {
+            case Number n -> (R) switch (clazz.getSimpleName()) {
+                case "Long"    -> Long.valueOf(n.longValue());
+                case "Integer" -> Integer.valueOf(n.intValue());
+                case "Double"  -> Double.valueOf(n.doubleValue());
+                default        -> value;
+            };
+            default -> clazz.cast(value);
+        };
+    }
+    
 
     // =========================================================================
     // MÉTODOS CORE MULTI-TENANT (Com chaves genéricas e segurança de isolamento)

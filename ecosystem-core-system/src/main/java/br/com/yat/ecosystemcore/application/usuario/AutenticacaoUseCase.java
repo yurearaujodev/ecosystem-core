@@ -1,15 +1,16 @@
 package br.com.yat.ecosystemcore.application.usuario;
 
-import br.com.yat.ecosystemcore.application.usuario.dto.SessaoDTO;
+//import br.com.yat.ecosystemcore.application.usuario.dto.SessaoDTO;
 import br.com.yat.ecosystemcore.domain.entity.*;
-import br.com.yat.ecosystemcore.repository.empresa.EmpresaRepository;
 import br.com.yat.ecosystemcore.repository.tenant.TenantRepository;
 import br.com.yat.ecosystemcore.service.external.SessionService;
 import br.com.yat.ecosystemcore.shared.context.SessionContext;
 import br.com.yat.ecosystemcore.shared.context.UserContext;
 import br.com.yat.ecosystemcore.shared.database.TransactionManager;
-import br.com.yat.ecosystemcore.ui.modules.usuario.entity.Usuario;
-import br.com.yat.ecosystemcore.ui.modules.usuario.repository.UsuarioRepository;
+import br.com.yat.ecosystemcore.modules.empresa.entity.Empresa;
+import br.com.yat.ecosystemcore.modules.empresa.repository.EmpresaRepository;
+import br.com.yat.ecosystemcore.modules.usuario.entity.Usuario;
+import br.com.yat.ecosystemcore.modules.usuario.repository.UsuarioRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,13 +65,14 @@ public class AutenticacaoUseCase {
 					usuarioRepository.resetControleAcesso(conn, usuario.getId(), usuario.getTenantId());
 				}
 
-				Tenant tenant = tenantRepository.findTenantPorIdSemTenantId(conn, usuario.getTenantId())
+				Tenant tenant = tenantRepository.findGlobalById(conn, usuario.getTenantId())
 						.orElseThrow(() -> new SQLException("Tenant escopo não encontrado no ecossistema."));
 
 				Empresa empresa = null;
 				if (usuario.getEmpresaPadraoId() != null && usuario.getEmpresaPadraoId() > 0) {
-					empresa = empresaRepository.findEmpresaPorIdSemTenantId(conn, usuario.getEmpresaPadraoId())
-							.orElse(null);
+
+					empresa = empresaRepository
+							.findByIdAndTenant(conn, usuario.getEmpresaPadraoId(), usuario.getTenantId()).orElse(null);
 				}
 
 				SessaoUsuario sessao = sessionService.criarSessao(usuario, empresa);
@@ -79,8 +81,8 @@ public class AutenticacaoUseCase {
 
 				logger.info("Sessão [{}] aberta com sucesso para o usuário: {}", sessao.getId(), usuario.getEmail());
 
-				UserContext userContext = new UserContext(usuario.getId(), usuario.getEmail(), usuario.getEmail(), 
-				        java.util.Collections.emptySet());
+				UserContext userContext = new UserContext(usuario.getId(), usuario.getEmail(), usuario.getEmail(),
+						java.util.Collections.emptySet());
 
 				return new SessionContext(usuario.getId(), tenant.getId(), empresa != null ? empresa.getId() : null,
 						sessao.getId(), sessao.getExpiraEm(), null, sessao.getRefreshToken(), userContext);

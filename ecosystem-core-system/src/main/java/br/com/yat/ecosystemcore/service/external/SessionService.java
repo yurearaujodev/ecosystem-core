@@ -3,7 +3,8 @@ package br.com.yat.ecosystemcore.service.external;
 import br.com.yat.ecosystemcore.domain.entity.*;
 import br.com.yat.ecosystemcore.repository.usuario.SessaoUsuarioRepository;
 import br.com.yat.ecosystemcore.shared.util.TokenGenerator;
-import br.com.yat.ecosystemcore.ui.modules.usuario.entity.Usuario;
+import br.com.yat.ecosystemcore.modules.empresa.entity.Empresa;
+import br.com.yat.ecosystemcore.modules.usuario.entity.Usuario;
 
 import java.sql.Connection;
 import java.sql.SQLException;

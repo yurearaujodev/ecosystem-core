@@ -31,7 +31,7 @@ public class SalvarDetalhesSegurancaUsuarioUseCase {
     public void execute(AtualizarDetalhesUsuarioCommand command) throws SQLException {
         // 1. Capture o tenant ANTES de entrar na transação
         // Isso garante que você não dependa do estado interno da conexão (schema)
-        String tenantIdAtivo = Sessao.tenant().getId(); 
+        String tenantIdAtivo = Sessao.tenantId(); 
 
         if (tenantIdAtivo == null) {
             throw new SQLException("Sessão expirada ou tenant não identificado.");

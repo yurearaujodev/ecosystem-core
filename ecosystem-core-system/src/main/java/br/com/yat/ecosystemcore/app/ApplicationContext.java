@@ -3,7 +3,6 @@ package br.com.yat.ecosystemcore.app;
 import br.com.yat.ecosystemcore.application.usuario.AutenticacaoUseCase;
 import br.com.yat.ecosystemcore.application.usuario.BCryptPasswordEncoder;
 import br.com.yat.ecosystemcore.application.usuario.PasswordEncoder;
-import br.com.yat.ecosystemcore.repository.empresa.EmpresaRepository;
 import br.com.yat.ecosystemcore.repository.perfil.EmpresaUsuarioRepository;
 import br.com.yat.ecosystemcore.repository.tenant.TenantRepository;
 import br.com.yat.ecosystemcore.repository.usuario.SessaoUsuarioRepository;
@@ -14,14 +13,20 @@ import br.com.yat.ecosystemcore.shared.context.Sessao;
 import br.com.yat.ecosystemcore.shared.context.SessionScope;
 import br.com.yat.ecosystemcore.shared.security.CachedSessionSecurityService;
 import br.com.yat.ecosystemcore.shared.security.UserContextProvider;
-import br.com.yat.ecosystemcore.ui.modules.usuario.repository.UsuarioRepository;
-import br.com.yat.ecosystemcore.ui.modules.usuario.service.UsuarioService;
+import br.com.yat.ecosystemcore.modules.empresa.repository.EmpresaRepository;
+import br.com.yat.ecosystemcore.modules.empresa.service.EmpresaService;
+import br.com.yat.ecosystemcore.modules.pessoa.repository.PessoaRepository;
+import br.com.yat.ecosystemcore.modules.pessoa.service.PessoaService;
+import br.com.yat.ecosystemcore.modules.usuario.repository.UsuarioRepository;
+import br.com.yat.ecosystemcore.modules.usuario.service.UsuarioService;
 
 public final class ApplicationContext {
 
 	private static boolean initialized = false;
 	private static SessionService sessionService;
-	private static UsuarioService usuarioService; // 🌟 1. Atributo estático para o serviço
+	private static UsuarioService usuarioService;
+	private static EmpresaService empresaService;
+	private static PessoaService pessoaService;
 
 	public static void init() {
 		if (initialized)
@@ -32,6 +37,7 @@ public final class ApplicationContext {
 		TenantRepository tenantRepository = new TenantRepository();
 		EmpresaRepository empresaRepository = new EmpresaRepository();
 		SessaoUsuarioRepository sessaoUsuarioRepository = new SessaoUsuarioRepository();
+		PessoaRepository pessoaRepository = new PessoaRepository();
 		
 		// 🌟 2. Novos repositórios necessários para o UsuarioService
 		EmpresaUsuarioRepository empresaUsuarioRepository = new EmpresaUsuarioRepository();
@@ -57,6 +63,8 @@ public final class ApplicationContext {
 				segurancaConfigRepository, 
 				empresaUsuarioService
 		);
+		empresaService = new EmpresaService(empresaRepository);
+		pessoaService = new PessoaService(pessoaRepository);
 
 		// ================= USE CASES =================
 		AutenticacaoUseCase autenticacaoUseCase = new AutenticacaoUseCase(
@@ -72,6 +80,13 @@ public final class ApplicationContext {
 	// 🌟 4. Getter global para os Controllers utilizarem
 	public static UsuarioService getUsuarioService() {
 		return usuarioService;
+	}
+	public static EmpresaService getEmpresaService() {
+		return empresaService;
+	}
+	
+	public static PessoaService getPessoaService() {
+		return pessoaService;
 	}
 
 	public static AutenticacaoUseCase getAutenticacaoUseCase() {

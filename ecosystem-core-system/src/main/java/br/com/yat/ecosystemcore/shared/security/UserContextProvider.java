@@ -2,7 +2,7 @@ package br.com.yat.ecosystemcore.shared.security;
 
 import br.com.yat.ecosystemcore.shared.context.UserContext;
 import br.com.yat.ecosystemcore.shared.database.TransactionManager;
-import br.com.yat.ecosystemcore.ui.modules.usuario.repository.UsuarioRepository;
+import br.com.yat.ecosystemcore.modules.usuario.repository.UsuarioRepository;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;

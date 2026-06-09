@@ -1,8 +1,8 @@
 package br.com.yat.ecosystemcore.application.usuario.dto;
 
-import br.com.yat.ecosystemcore.domain.entity.Empresa;
 import br.com.yat.ecosystemcore.domain.entity.Tenant;
-import br.com.yat.ecosystemcore.ui.modules.usuario.entity.Usuario;
+import br.com.yat.ecosystemcore.modules.empresa.entity.Empresa;
+import br.com.yat.ecosystemcore.modules.usuario.entity.Usuario;
 
 import java.time.LocalDateTime;
 
