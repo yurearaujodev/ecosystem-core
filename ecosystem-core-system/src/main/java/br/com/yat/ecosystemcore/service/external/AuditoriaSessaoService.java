@@ -1,11 +1,11 @@
 package br.com.yat.ecosystemcore.service.external;
 
-import br.com.yat.ecosystemcore.domain.dto.SessaoAtivaProjecaoDTO;
-import br.com.yat.ecosystemcore.domain.entity.TentativaLoginLog;
-import br.com.yat.ecosystemcore.repository.usuario.SessaoUsuarioRepository;
+import br.com.yat.ecosystemcore.modules.auditoria.entity.TentativaLoginLog;
+import br.com.yat.ecosystemcore.modules.auditoria.repository.SegurancaAuditoriaRepository;
+import br.com.yat.ecosystemcore.modules.autenticacao.dto.SessaoAtivaProjecaoDTO;
+import br.com.yat.ecosystemcore.modules.autenticacao.repository.SessaoUsuarioRepository;
 import br.com.yat.ecosystemcore.shared.context.SessionScope;
 import br.com.yat.ecosystemcore.shared.database.TransactionManager;
-import br.com.yat.ecosystemcore.repository.usuario.SegurancaAuditoriaRepository;
 
 import java.sql.SQLException;
 import java.util.List;

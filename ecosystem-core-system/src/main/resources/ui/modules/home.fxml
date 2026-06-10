@@ -8,7 +8,7 @@
 <StackPane prefHeight="600.0" prefWidth="800.0" 
            xmlns="http://javafx.com/javafx/21" 
            xmlns:fx="http://javafx.com/fxml/1" 
-           fx:controller="br.com.yat.ecosystemcore.ui.modules.home.HomeController"
+           fx:controller="br.com.yat.ecosystemcore.modules.home.ui.HomeController"
            style="-fx-background-color: #FFFFFF; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.02), 5, 5, 0, 0);">
    
    <children>

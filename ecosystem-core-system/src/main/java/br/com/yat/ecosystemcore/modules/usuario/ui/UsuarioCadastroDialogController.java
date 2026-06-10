@@ -1,18 +1,21 @@
 package br.com.yat.ecosystemcore.modules.usuario.ui;
 
 import br.com.yat.ecosystemcore.app.ApplicationContext;
-import br.com.yat.ecosystemcore.application.usuario.BCryptPasswordEncoder;
-import br.com.yat.ecosystemcore.application.usuario.PasswordEncoder;
 import br.com.yat.ecosystemcore.domain.entity.*;
 import br.com.yat.ecosystemcore.service.external.*;
 import br.com.yat.ecosystemcore.shared.context.Sessao;
 import br.com.yat.ecosystemcore.shared.current.AppExecutors;
 import br.com.yat.ecosystemcore.shared.util.PasswordExtractor;
-import br.com.yat.ecosystemcore.modules.empresa.entity.Empresa;
-import br.com.yat.ecosystemcore.modules.empresa.service.EmpresaService;
-import br.com.yat.ecosystemcore.modules.pessoa.entity.Pessoa;
-import br.com.yat.ecosystemcore.modules.pessoa.service.PessoaService;
+import br.com.yat.ecosystemcore.modules.cadastro.entity.Pessoa;
+import br.com.yat.ecosystemcore.modules.cadastro.service.PessoaService;
+import br.com.yat.ecosystemcore.modules.seguranca.entity.Perfil;
+import br.com.yat.ecosystemcore.modules.seguranca.service.PerfilService;
+import br.com.yat.ecosystemcore.modules.cadastro.entity.Empresa;
+import br.com.yat.ecosystemcore.modules.cadastro.service.EmpresaService;
+import br.com.yat.ecosystemcore.modules.usuario.dto.EmpresaUsuarioDetalheDTO;
 import br.com.yat.ecosystemcore.modules.usuario.entity.Usuario;
+import br.com.yat.ecosystemcore.modules.usuario.service.BCryptPasswordEncoder;
+import br.com.yat.ecosystemcore.modules.usuario.service.PasswordEncoder;
 import br.com.yat.ecosystemcore.modules.usuario.service.UsuarioService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -51,7 +54,7 @@ public class UsuarioCadastroDialogController {
 	private Usuario usuarioEmEdicao;
 
 	private final UsuarioService usuarioService = ApplicationContext.getUsuarioService();
-	private final PerfilService perfilService = new PerfilService();
+	private final PerfilService perfilService = ApplicationContext.getPerfilService();
 	private final EmpresaService empresaService = ApplicationContext.getEmpresaService();
 	private final PessoaService pessoaService = ApplicationContext.getPessoaService();
 	private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -97,7 +100,7 @@ public class UsuarioCadastroDialogController {
 
 		AppExecutors.execute(() -> {
 			try {
-				List<Perfil> perfis = perfilService.listarPerfisPorTenant(Sessao.tenantId());
+				List<Perfil> perfis = perfilService.listarPerfisPorTenant();
 				List<Empresa> empresas = empresaService.listarEmpresasDoTenantAtivo();
 				Platform.runLater(() -> {
 					cmbPerfil.setItems(FXCollections.observableArrayList(perfis));

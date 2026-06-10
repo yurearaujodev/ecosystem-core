@@ -1,9 +1,8 @@
 package br.com.yat.ecosystemcore.modules.usuario.ui;
 
 import br.com.yat.ecosystemcore.app.ApplicationContext;
-import br.com.yat.ecosystemcore.domain.entity.EmpresaUsuarioDetalheDTO;
-import br.com.yat.ecosystemcore.shared.context.Sessao;
 import br.com.yat.ecosystemcore.shared.current.AppExecutors;
+import br.com.yat.ecosystemcore.modules.usuario.dto.EmpresaUsuarioDetalheDTO;
 import br.com.yat.ecosystemcore.modules.usuario.entity.Usuario;
 import br.com.yat.ecosystemcore.modules.usuario.service.UsuarioService;
 import javafx.application.Platform;

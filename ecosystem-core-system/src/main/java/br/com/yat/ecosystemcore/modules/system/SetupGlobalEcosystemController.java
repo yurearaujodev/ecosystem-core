@@ -1,7 +1,7 @@
 package br.com.yat.ecosystemcore.ui.modules.system;
 
 import br.com.yat.ecosystemcore.application.system.dto.SetupEcosystemCommand;
-import br.com.yat.ecosystemcore.application.system.usecase.SetupGlobalEcosystemUseCase;
+import br.com.yat.ecosystemcore.modules.sistema.service.SetupGlobalEcosystemUseCase;
 import br.com.yat.ecosystemcore.shared.current.AppExecutors;
 import javafx.application.Platform;
 import javafx.fxml.FXML;

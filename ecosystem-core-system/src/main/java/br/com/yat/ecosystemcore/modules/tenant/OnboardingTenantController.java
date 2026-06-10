@@ -1,4 +1,4 @@
-package br.com.yat.ecosystemcore.ui.modules.tenant;
+package br.com.yat.ecosystemcore.modules.tenant;
 
 import br.com.yat.ecosystemcore.application.tenant.OnboardingTenantUseCase;
 import br.com.yat.ecosystemcore.application.tenant.OnboardingTenantUseCaseFactory;

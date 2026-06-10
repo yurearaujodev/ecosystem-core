@@ -6,7 +6,7 @@
 <?import javafx.geometry.Insets?>
 
 <VBox spacing="15.0" alignment="CENTER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="br.com.yat.ecosystemcore.ui.modules.usuario.MfaConfigController" style="-fx-background-color: #ffffff;">
+      fx:controller="br.com.yat.ecosystemcore.modules.seguranca.ui.MfaConfigController" style="-fx-background-color: #ffffff;">
     <padding>
         <Insets top="25" right="25" bottom="25" left="25"/>
     </padding>

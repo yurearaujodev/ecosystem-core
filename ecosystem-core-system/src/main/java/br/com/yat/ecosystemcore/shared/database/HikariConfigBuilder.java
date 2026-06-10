@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariConfig;
 
-import br.com.yat.ecosystemcore.configuration.DatabaseConfigLoader;
-import br.com.yat.ecosystemcore.domain.enums.CryptoErrorType;
-import br.com.yat.ecosystemcore.infrastructure.security.CryptoException;
-import br.com.yat.ecosystemcore.infrastructure.security.DatabaseFieldDecryptor;
-import br.com.yat.ecosystemcore.infrastructure.security.DatabasePasswordDecryptor;
-import br.com.yat.ecosystemcore.infrastructure.security.SensitiveData;
+import br.com.yat.ecosystemcore.shared.exception.CryptoErrorType;
+import br.com.yat.ecosystemcore.shared.exception.CryptoException;
+import br.com.yat.ecosystemcore.shared.security.DatabaseFieldDecryptor;
+import br.com.yat.ecosystemcore.shared.security.DatabasePasswordDecryptor;
+import br.com.yat.ecosystemcore.shared.security.SensitiveData;
+import br.com.yat.ecosystemcore.shared.util.DatabaseConfigLoader;
 
 /**
  * Classe utilitária para construção de configurações do pool de conexões

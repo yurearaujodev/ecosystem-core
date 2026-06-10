@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.yat.ecosystemcore.infrastructure.security.CryptoException;
-import br.com.yat.ecosystemcore.infrastructure.security.DatabasePasswordDecryptor;
+import br.com.yat.ecosystemcore.shared.exception.CryptoException;
+import br.com.yat.ecosystemcore.shared.security.DatabasePasswordDecryptor;
 
 @DisplayName("Unidade - DatabasePasswordDecryptor")
 class DatabasePasswordDecryptorTest {

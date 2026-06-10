@@ -6,7 +6,7 @@
 
 <VBox spacing="15.0" style="-fx-background-color: #f8f9fa;" stylesheets="@global.css" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="br.com.yat.ecosystemcore.ui.modules.perfil.PerfilCadastroController"
+      fx:controller="br.com.yat.ecosystemcore.modules.seguranca.ui.PerfilCadastroController"
       prefWidth="460.0" prefHeight="420.0">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

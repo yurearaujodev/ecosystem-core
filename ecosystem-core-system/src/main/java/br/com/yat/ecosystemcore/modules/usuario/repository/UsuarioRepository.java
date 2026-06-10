@@ -1,7 +1,7 @@
 package br.com.yat.ecosystemcore.modules.usuario.repository;
 
-import br.com.yat.ecosystemcore.repository.base.GenericDao;
 import br.com.yat.ecosystemcore.shared.context.UserContext;
+import br.com.yat.ecosystemcore.shared.database.GenericDao;
 import br.com.yat.ecosystemcore.modules.usuario.entity.Usuario;
 
 import java.sql.*;

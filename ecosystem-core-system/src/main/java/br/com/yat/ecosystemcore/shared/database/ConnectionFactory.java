@@ -6,9 +6,6 @@ import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import br.com.yat.ecosystemcore.domain.entity.DatabaseConfig;
-import br.com.yat.ecosystemcore.domain.entity.DatabaseCredentials;
 /**
  * Classe utilitária responsável por fornecer conexões ao banco de dados
  * e delegar operações de trannsação ao {@link ConnectionPoolManager}.

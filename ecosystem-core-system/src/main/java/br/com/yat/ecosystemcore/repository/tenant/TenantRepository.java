@@ -1,7 +1,7 @@
 package br.com.yat.ecosystemcore.repository.tenant;
 
 import br.com.yat.ecosystemcore.domain.entity.Tenant;
-import br.com.yat.ecosystemcore.repository.base.GenericDao;
+import br.com.yat.ecosystemcore.shared.database.GenericDao;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

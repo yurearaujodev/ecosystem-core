@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.yat.ecosystemcore.domain.dto.DatabaseForm;
+import br.com.yat.ecosystemcore.modules.sistema.dto.DatabaseForm;
 
 @DisplayName("Unidade - DatabaseForm")
 class DatabaseFormTest {

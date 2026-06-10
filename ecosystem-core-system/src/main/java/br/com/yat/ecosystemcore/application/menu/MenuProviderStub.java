@@ -1,7 +1,7 @@
 package br.com.yat.ecosystemcore.application.menu;
 
 import br.com.yat.ecosystemcore.application.menu.dto.MenuPermitidoDTO;
-import br.com.yat.ecosystemcore.domain.enums.MenuChave;
+import br.com.yat.ecosystemcore.modules.navegacao.entity.MenuChave;
 
 import java.util.ArrayList;
 import java.util.List;

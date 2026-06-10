@@ -7,7 +7,7 @@
 
 <StackPane fx:id="rootContainer" xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="br.com.yat.ecosystemcore.ui.menu.MenuController">
+           fx:controller="br.com.yat.ecosystemcore.modules.navegacao.ui.MenuController">
 
     <BorderPane fx:id="rootPane" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #F8F9FA;">
 

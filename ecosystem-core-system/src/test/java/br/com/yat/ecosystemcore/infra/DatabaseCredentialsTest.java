@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.yat.ecosystemcore.domain.entity.DatabaseCredentials;
+import br.com.yat.ecosystemcore.shared.database.DatabaseCredentials;
 
 @DisplayName("Unidade - DatabaseCredentials")
 class DatabaseCredentialsTest {

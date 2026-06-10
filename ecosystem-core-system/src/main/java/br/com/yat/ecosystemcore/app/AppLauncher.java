@@ -1,8 +1,8 @@
 package br.com.yat.ecosystemcore.app;
 
+import br.com.yat.ecosystemcore.modules.autenticacao.ui.LoginController;
 import br.com.yat.ecosystemcore.shared.current.AppExecutors;
 import br.com.yat.ecosystemcore.shared.database.ConnectionFactory;
-import br.com.yat.ecosystemcore.modules.login.LoginController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

@@ -1,13 +1,12 @@
 package br.com.yat.ecosystemcore.modules.usuario.service;
 
-import br.com.yat.ecosystemcore.domain.entity.EmpresaUsuarioDetalheDTO;
-import br.com.yat.ecosystemcore.repository.perfil.EmpresaUsuarioRepository;
-import br.com.yat.ecosystemcore.repository.usuario.UsuarioSegurancaConfigRepository;
-import br.com.yat.ecosystemcore.service.external.EmpresaUsuarioService;
 import br.com.yat.ecosystemcore.shared.database.TransactionManager;
 import br.com.yat.ecosystemcore.shared.service.BaseService;
+import br.com.yat.ecosystemcore.modules.usuario.dto.EmpresaUsuarioDetalheDTO;
 import br.com.yat.ecosystemcore.modules.usuario.entity.Usuario;
+import br.com.yat.ecosystemcore.modules.usuario.repository.EmpresaUsuarioRepository;
 import br.com.yat.ecosystemcore.modules.usuario.repository.UsuarioRepository;
+import br.com.yat.ecosystemcore.modules.usuario.repository.UsuarioSegurancaConfigRepository;
 
 import java.sql.SQLException;
 import java.util.List;

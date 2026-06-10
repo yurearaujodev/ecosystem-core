@@ -1,7 +1,8 @@
 package br.com.yat.ecosystemcore.application.system.dto;
 
-import br.com.yat.ecosystemcore.domain.entity.EmpresaUsuarioDetalheDTO;
 import java.util.List;
+
+import br.com.yat.ecosystemcore.modules.usuario.dto.EmpresaUsuarioDetalheDTO;
 
 public record AtualizarDetalhesUsuarioCommand(
     Long usuarioId,

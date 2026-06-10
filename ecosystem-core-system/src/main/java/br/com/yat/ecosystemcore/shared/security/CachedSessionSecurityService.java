@@ -1,7 +1,7 @@
 package br.com.yat.ecosystemcore.shared.security;
 
-import br.com.yat.ecosystemcore.domain.entity.SessaoUsuario;
-import br.com.yat.ecosystemcore.repository.usuario.SessaoUsuarioRepository;
+import br.com.yat.ecosystemcore.modules.autenticacao.entity.SessaoUsuario;
+import br.com.yat.ecosystemcore.modules.autenticacao.repository.SessaoUsuarioRepository;
 import br.com.yat.ecosystemcore.shared.database.TransactionManager;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;

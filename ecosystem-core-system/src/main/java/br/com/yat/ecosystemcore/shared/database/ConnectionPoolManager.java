@@ -13,9 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import br.com.yat.ecosystemcore.configuration.DatabaseConfigLoader;
-import br.com.yat.ecosystemcore.domain.entity.DatabaseConfig;
-import br.com.yat.ecosystemcore.domain.entity.DatabaseCredentials;
+import br.com.yat.ecosystemcore.shared.util.DatabaseConfigLoader;
 
 /**
  * Classe utilitária responsável por gerenciar o pool de conexões do banco de

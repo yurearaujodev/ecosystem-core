@@ -1,7 +1,7 @@
 package br.com.yat.ecosystemcore.ui.modules.system;
 
 import br.com.yat.ecosystemcore.application.system.dto.OutboxEventDTO;
-import br.com.yat.ecosystemcore.application.system.usecase.GestaoSistemaUseCase;
+import br.com.yat.ecosystemcore.modules.sistema.service.GestaoSistemaUseCase;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;

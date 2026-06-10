@@ -1,10 +1,10 @@
 package br.com.yat.ecosystemcore.application.menu.dto;
 
-import br.com.yat.ecosystemcore.domain.enums.MenuChave;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
+import br.com.yat.ecosystemcore.modules.navegacao.entity.MenuChave;
 
 /**
  * Visão agregada pronta para a UI (módulo + item de menu permitido).

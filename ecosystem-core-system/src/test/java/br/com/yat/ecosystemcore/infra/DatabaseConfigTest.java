@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.yat.ecosystemcore.domain.entity.DatabaseConfig;
-import br.com.yat.ecosystemcore.exception.DatabaseValidationException;
+import br.com.yat.ecosystemcore.shared.database.DatabaseConfig;
+import br.com.yat.ecosystemcore.shared.exception.DatabaseValidationException;
 
 @DisplayName("Unidade - DatabaseConfig")
 class DatabaseConfigTest {

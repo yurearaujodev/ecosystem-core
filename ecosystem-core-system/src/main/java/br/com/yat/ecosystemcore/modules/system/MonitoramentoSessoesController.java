@@ -1,7 +1,7 @@
 package br.com.yat.ecosystemcore.ui.modules.system;
 
-import br.com.yat.ecosystemcore.domain.dto.SessaoAtivaProjecaoDTO;
-import br.com.yat.ecosystemcore.domain.entity.TentativaLoginLog;
+import br.com.yat.ecosystemcore.modules.auditoria.entity.TentativaLoginLog;
+import br.com.yat.ecosystemcore.modules.autenticacao.dto.SessaoAtivaProjecaoDTO;
 import br.com.yat.ecosystemcore.ui.core.ScreenLifecycle;
 import br.com.yat.ecosystemcore.service.external.AuditoriaSessaoService;
 import br.com.yat.ecosystemcore.shared.current.AppExecutors;
