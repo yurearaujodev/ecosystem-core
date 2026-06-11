@@ -2,14 +2,14 @@ package br.com.yat.ecosystemcore.modules.autenticacao.service;
 
 //import br.com.yat.ecosystemcore.application.usuario.dto.SessaoDTO;
 import br.com.yat.ecosystemcore.domain.entity.*;
-import br.com.yat.ecosystemcore.repository.tenant.TenantRepository;
-import br.com.yat.ecosystemcore.service.external.SessionService;
 import br.com.yat.ecosystemcore.shared.context.SessionContext;
 import br.com.yat.ecosystemcore.shared.context.UserContext;
 import br.com.yat.ecosystemcore.shared.database.TransactionManager;
 import br.com.yat.ecosystemcore.modules.autenticacao.entity.SessaoUsuario;
 import br.com.yat.ecosystemcore.modules.cadastro.entity.Empresa;
 import br.com.yat.ecosystemcore.modules.cadastro.repository.EmpresaRepository;
+import br.com.yat.ecosystemcore.modules.tenant.entity.Tenant;
+import br.com.yat.ecosystemcore.modules.tenant.repository.TenantRepository;
 import br.com.yat.ecosystemcore.modules.usuario.entity.Usuario;
 import br.com.yat.ecosystemcore.modules.usuario.repository.UsuarioRepository;
 import br.com.yat.ecosystemcore.modules.usuario.service.PasswordEncoder;
@@ -27,11 +27,11 @@ public class AutenticacaoUseCase {
 	private final UsuarioRepository usuarioRepository;
 	private final TenantRepository tenantRepository;
 	private final EmpresaRepository empresaRepository;
-	private final SessionService sessionService;
+	private final SessaoUsuarioService sessionService;
 	private final PasswordEncoder passwordEncoder;
 
 	public AutenticacaoUseCase(UsuarioRepository usuarioRepository, TenantRepository tenantRepository,
-			EmpresaRepository empresaRepository, SessionService sessionService, PasswordEncoder passwordEncoder) {
+			EmpresaRepository empresaRepository, SessaoUsuarioService sessionService, PasswordEncoder passwordEncoder) {
 
 		this.usuarioRepository = usuarioRepository;
 		this.tenantRepository = tenantRepository;

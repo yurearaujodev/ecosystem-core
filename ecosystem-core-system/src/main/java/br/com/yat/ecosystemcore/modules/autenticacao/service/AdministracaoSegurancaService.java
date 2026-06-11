@@ -1,4 +1,4 @@
-package br.com.yat.ecosystemcore.service.external;
+package br.com.yat.ecosystemcore.modules.autenticacao.service;
 
 import br.com.yat.ecosystemcore.modules.auditoria.entity.TentativaLoginLog;
 import br.com.yat.ecosystemcore.modules.auditoria.repository.SegurancaAuditoriaRepository;
@@ -6,11 +6,12 @@ import br.com.yat.ecosystemcore.modules.autenticacao.dto.SessaoAtivaProjecaoDTO;
 import br.com.yat.ecosystemcore.modules.autenticacao.repository.SessaoUsuarioRepository;
 import br.com.yat.ecosystemcore.shared.context.SessionScope;
 import br.com.yat.ecosystemcore.shared.database.TransactionManager;
+import br.com.yat.ecosystemcore.shared.service.BaseService;
 
 import java.sql.SQLException;
 import java.util.List;
 
-public class AuditoriaSessaoService {
+public class AdministracaoSegurancaService extends BaseService{
 
     private final SessaoUsuarioRepository sessaoRepository = new SessaoUsuarioRepository();
     private final SegurancaAuditoriaRepository auditoriaRepository = new SegurancaAuditoriaRepository();
@@ -19,7 +20,7 @@ public class AuditoriaSessaoService {
      * Obtém todas as sessões abertas no momento filtradas pelo Tenant do Admin logado.
      */
     public List<SessaoAtivaProjecaoDTO> obterSessoesAtivas() throws SQLException {
-        String tenantId = SessionScope.tenant().getId();
+        String tenantId = SessionScope.tenantId();
         return TransactionManager.executeInTransaction(conn -> 
             sessaoRepository.listarSessoesAtivasPorTenant(conn, tenantId)
         );
@@ -29,7 +30,7 @@ public class AuditoriaSessaoService {
      * Resgata as últimas tentativas de login para avaliar anomalias visuais ou brute-force.
      */
     public List<TentativaLoginLog> obterHistoricoTentativas() throws SQLException {
-        String tenantId = SessionScope.tenant().getId();
+        String tenantId = SessionScope.tenantId();
         return TransactionManager.executeInTransaction(conn -> 
             auditoriaRepository.buscarLogsRecentes(conn, tenantId, 50)
         );
@@ -48,7 +49,7 @@ public class AuditoriaSessaoService {
      * Remove a confiança atribuída a uma máquina ou terminal Desktop específico.
      */
     public void revogarDispositivo(Long dispositivoId) throws SQLException {
-        String tenantId = SessionScope.tenant().getId();
+        String tenantId = SessionScope.tenantId();
         TransactionManager.executeVoidInTransaction(conn -> {
             auditoriaRepository.revogarDispositivoConfiavel(conn, dispositivoId, tenantId);
         });

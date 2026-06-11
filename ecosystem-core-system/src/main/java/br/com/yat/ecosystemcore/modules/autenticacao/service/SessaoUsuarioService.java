@@ -1,6 +1,5 @@
-package br.com.yat.ecosystemcore.service.external;
+package br.com.yat.ecosystemcore.modules.autenticacao.service;
 
-import br.com.yat.ecosystemcore.domain.entity.*;
 import br.com.yat.ecosystemcore.shared.util.TokenGenerator;
 import br.com.yat.ecosystemcore.modules.autenticacao.entity.SessaoUsuario;
 import br.com.yat.ecosystemcore.modules.autenticacao.repository.SessaoUsuarioRepository;
@@ -11,11 +10,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-public class SessionService {
+public class SessaoUsuarioService {
 
 	private final SessaoUsuarioRepository repository;
 
-	public SessionService(SessaoUsuarioRepository repository) {
+	public SessaoUsuarioService(SessaoUsuarioRepository repository) {
 		this.repository = repository;
 	}
 

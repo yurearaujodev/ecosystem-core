@@ -1,4 +1,4 @@
-package br.com.yat.ecosystemcore.repository.menu;
+package br.com.yat.ecosystemcore.modules.navegacao.repository;
 
 import br.com.yat.ecosystemcore.application.menu.MenuUsuarioContext;
 import br.com.yat.ecosystemcore.application.menu.dto.MenuPermitidoDTO;

@@ -1,4 +1,4 @@
-package br.com.yat.ecosystemcore.service.external;
+package br.com.yat.ecosystemcore.shared.database;
 
 import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
@@ -11,8 +11,6 @@ import javax.crypto.SecretKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import br.com.yat.ecosystemcore.shared.database.DatabaseConfig;
-import br.com.yat.ecosystemcore.shared.database.DatabaseCredentials;
 import br.com.yat.ecosystemcore.shared.exception.CryptoException;
 import br.com.yat.ecosystemcore.shared.security.AESUtils;
 import br.com.yat.ecosystemcore.shared.security.KeyManager;

@@ -1,8 +1,6 @@
 package br.com.yat.ecosystemcore.modules.usuario.ui;
 
 import br.com.yat.ecosystemcore.app.ApplicationContext;
-import br.com.yat.ecosystemcore.domain.entity.*;
-import br.com.yat.ecosystemcore.service.external.*;
 import br.com.yat.ecosystemcore.shared.context.Sessao;
 import br.com.yat.ecosystemcore.shared.current.AppExecutors;
 import br.com.yat.ecosystemcore.shared.util.PasswordExtractor;

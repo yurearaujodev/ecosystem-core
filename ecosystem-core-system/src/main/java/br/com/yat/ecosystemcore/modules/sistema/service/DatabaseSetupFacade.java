@@ -3,8 +3,8 @@ package br.com.yat.ecosystemcore.modules.sistema.service;
 import java.util.function.Consumer;
 
 import br.com.yat.ecosystemcore.modules.sistema.dto.DatabaseForm;
-import br.com.yat.ecosystemcore.service.external.DatabaseSetupService;
 import br.com.yat.ecosystemcore.shared.database.DatabaseConfig;
+import br.com.yat.ecosystemcore.shared.database.DatabaseSetupService;
 import br.com.yat.ecosystemcore.shared.database.DatabaseStatus;
 
 public final class DatabaseSetupFacade {

@@ -1,9 +1,9 @@
-package br.com.yat.ecosystemcore.ui.modules.system;
+package br.com.yat.ecosystemcore.modules.system;
 
 import br.com.yat.ecosystemcore.modules.auditoria.entity.TentativaLoginLog;
 import br.com.yat.ecosystemcore.modules.autenticacao.dto.SessaoAtivaProjecaoDTO;
-import br.com.yat.ecosystemcore.ui.core.ScreenLifecycle;
-import br.com.yat.ecosystemcore.service.external.AuditoriaSessaoService;
+import br.com.yat.ecosystemcore.modules.autenticacao.service.AdministracaoSegurancaService;
+import br.com.yat.ecosystemcore.modules.navegacao.service.ScreenLifecycle;
 import br.com.yat.ecosystemcore.shared.current.AppExecutors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -30,7 +30,7 @@ public class MonitoramentoSessoesController implements ScreenLifecycle {
 
     @FXML private Button btnDerrubar;
 
-    private final AuditoriaSessaoService auditoriaService = new AuditoriaSessaoService();
+    private final AdministracaoSegurancaService auditoriaService = new AdministracaoSegurancaService();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     @FXML

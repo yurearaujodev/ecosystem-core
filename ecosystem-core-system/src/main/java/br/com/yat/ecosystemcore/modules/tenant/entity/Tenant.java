@@ -1,4 +1,4 @@
-package br.com.yat.ecosystemcore.domain.entity;
+package br.com.yat.ecosystemcore.modules.tenant.entity;
 
 import java.time.LocalDateTime;
 

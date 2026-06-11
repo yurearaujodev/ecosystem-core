@@ -4,11 +4,11 @@ import javafx.concurrent.Task;
 import java.util.function.Consumer;
 
 import br.com.yat.ecosystemcore.modules.sistema.dto.DatabaseForm;
-import br.com.yat.ecosystemcore.service.external.DatabaseConnectionService;
-import br.com.yat.ecosystemcore.service.external.DatabaseSetupService;
 import br.com.yat.ecosystemcore.shared.current.AppExecutors;
 import br.com.yat.ecosystemcore.shared.database.DatabaseConfig;
+import br.com.yat.ecosystemcore.shared.database.DatabaseConnectionService;
 import br.com.yat.ecosystemcore.shared.database.DatabaseCredentials;
+import br.com.yat.ecosystemcore.shared.database.DatabaseSetupService;
 import br.com.yat.ecosystemcore.shared.database.DatabaseStatus;
 
 public final class TestarConexaoUseCase {

@@ -9,7 +9,7 @@ import java.util.List;
  * <p>
  * Implementação atual: {@link MenuProviderStub} (dados fixos).
  * Implementação futura: JDBC via {@code modulo_sistema}, {@code menu_sistema} e
- * {@code permissao_menu}, delegando persistência a {@link br.com.yat.ecosystemcore.repository.menu.MenuSistemaRepository}.
+ * {@code permissao_menu}, delegando persistência a {@link br.com.yat.ecosystemcore.modules.navegacao.repository.MenuSistemaRepository}.
  * </p>
  */
 public interface MenuProvider {

@@ -1,7 +1,7 @@
 package br.com.yat.ecosystemcore.modules.sistema.service;
 
 import br.com.yat.ecosystemcore.application.system.dto.*;
-import br.com.yat.ecosystemcore.repository.system.SistemaMonitoramentoRepository;
+import br.com.yat.ecosystemcore.modules.sistema.repository.SistemaMonitoramentoRepository;
 
 import java.sql.SQLException;
 import java.util.List;

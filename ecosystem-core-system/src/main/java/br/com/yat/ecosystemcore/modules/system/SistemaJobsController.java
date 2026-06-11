@@ -1,4 +1,4 @@
-package br.com.yat.ecosystemcore.ui.modules.system;
+package br.com.yat.ecosystemcore.modules.system;
 
 import br.com.yat.ecosystemcore.application.system.dto.JobExecucaoDTO;
 import br.com.yat.ecosystemcore.modules.sistema.service.GestaoSistemaUseCase;

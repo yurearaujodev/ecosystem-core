@@ -2,11 +2,12 @@ package br.com.yat.ecosystemcore.application.tenant;
 
 import br.com.yat.ecosystemcore.application.tenant.dto.OnboardingTenantCommand;
 import br.com.yat.ecosystemcore.domain.entity.*;
-import br.com.yat.ecosystemcore.repository.tenant.TenantRepository;
 import br.com.yat.ecosystemcore.shared.database.TransactionManager;
 import br.com.yat.ecosystemcore.modules.cadastro.entity.Pessoa;
 import br.com.yat.ecosystemcore.modules.cadastro.repository.PessoaRepository;
 import br.com.yat.ecosystemcore.modules.seguranca.repository.PerfilRepository;
+import br.com.yat.ecosystemcore.modules.tenant.entity.Tenant;
+import br.com.yat.ecosystemcore.modules.tenant.repository.TenantRepository;
 import br.com.yat.ecosystemcore.modules.cadastro.entity.Empresa;
 import br.com.yat.ecosystemcore.modules.cadastro.repository.EmpresaRepository;
 import br.com.yat.ecosystemcore.modules.usuario.entity.Usuario;

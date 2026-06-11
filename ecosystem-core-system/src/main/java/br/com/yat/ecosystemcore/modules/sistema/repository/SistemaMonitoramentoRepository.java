@@ -1,4 +1,4 @@
-package br.com.yat.ecosystemcore.repository.system;
+package br.com.yat.ecosystemcore.modules.sistema.repository;
 
 import br.com.yat.ecosystemcore.application.system.dto.*;
 import br.com.yat.ecosystemcore.shared.database.ConnectionFactory;

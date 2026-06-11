@@ -1,7 +1,7 @@
 package br.com.yat.ecosystemcore.modules.autenticacao.dto;
 
-import br.com.yat.ecosystemcore.domain.entity.Tenant;
 import br.com.yat.ecosystemcore.modules.cadastro.entity.Empresa;
+import br.com.yat.ecosystemcore.modules.tenant.entity.Tenant;
 import br.com.yat.ecosystemcore.modules.usuario.entity.Usuario;
 
 import java.time.LocalDateTime;

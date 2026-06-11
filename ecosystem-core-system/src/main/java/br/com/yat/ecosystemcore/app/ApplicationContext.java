@@ -1,7 +1,5 @@
 package br.com.yat.ecosystemcore.app;
 
-import br.com.yat.ecosystemcore.repository.tenant.TenantRepository;
-import br.com.yat.ecosystemcore.service.external.SessionService;
 import br.com.yat.ecosystemcore.shared.context.Sessao;
 import br.com.yat.ecosystemcore.shared.context.SessionScope;
 import br.com.yat.ecosystemcore.shared.security.CachedSessionSecurityService;
@@ -11,6 +9,7 @@ import com.warrenstrange.googleauth.GoogleAuthenticator;
 
 import br.com.yat.ecosystemcore.modules.autenticacao.repository.SessaoUsuarioRepository;
 import br.com.yat.ecosystemcore.modules.autenticacao.service.AutenticacaoUseCase;
+import br.com.yat.ecosystemcore.modules.autenticacao.service.SessaoUsuarioService;
 import br.com.yat.ecosystemcore.modules.autorizacao.repository.PerfilPermissaoRepository;
 import br.com.yat.ecosystemcore.modules.autorizacao.repository.PermissaoRepository;
 import br.com.yat.ecosystemcore.modules.autorizacao.repository.UsuarioPermissaoRepository;
@@ -23,6 +22,7 @@ import br.com.yat.ecosystemcore.modules.seguranca.repository.MfaRepository;
 import br.com.yat.ecosystemcore.modules.seguranca.repository.PerfilRepository;
 import br.com.yat.ecosystemcore.modules.seguranca.service.MfaService;
 import br.com.yat.ecosystemcore.modules.seguranca.service.PerfilService;
+import br.com.yat.ecosystemcore.modules.tenant.repository.TenantRepository;
 import br.com.yat.ecosystemcore.modules.usuario.repository.EmpresaUsuarioRepository;
 import br.com.yat.ecosystemcore.modules.usuario.repository.UsuarioRepository;
 import br.com.yat.ecosystemcore.modules.usuario.repository.UsuarioSegurancaConfigRepository;
@@ -35,7 +35,7 @@ import br.com.yat.ecosystemcore.modules.usuario.service.UsuarioService;
 public final class ApplicationContext {
 
 	private static boolean initialized = false;
-	private static SessionService sessionService;
+	private static SessaoUsuarioService sessionService;
 	private static UsuarioService usuarioService;
 	private static EmpresaService empresaService;
 	private static PessoaService pessoaService;
@@ -66,7 +66,7 @@ public final class ApplicationContext {
 		PermissaoRepository permissaoRepository = new PermissaoRepository();
 
 		// ================= SERVICES CORE & SECURITY =================
-		sessionService = new SessionService(sessaoUsuarioRepository);
+		sessionService = new SessaoUsuarioService(sessaoUsuarioRepository);
 		CachedSessionSecurityService sessionSecurityService = new CachedSessionSecurityService(sessaoUsuarioRepository);
 
 		UserContextProvider.init(usuarioRepository);
@@ -144,7 +144,7 @@ public final class ApplicationContext {
 		return Holder.sessionSecurityService;
 	}
 
-	public static SessionService getSessionService() {
+	public static SessaoUsuarioService getSessionService() {
 		return sessionService;
 	}
 
